@@ -3,11 +3,17 @@ defmodule LiveDebuggerTour.StepDiscoveryTest do
 
   alias LiveDebuggerTour.StepDiscovery
 
-  test "list_steps/0 returns an empty list when no steps are defined" do
-    assert StepDiscovery.list_steps() == []
+  test "list_steps/0 discovers modules using LiveDebuggerTour.Step" do
+    steps = StepDiscovery.list_steps()
+
+    assert Enum.any?(steps, fn step ->
+             step.title == "Test Step" and step.number == 1 and step.path == "/steps/test"
+           end)
   end
 
-  test "list_steps/0 returns a list" do
-    assert is_list(StepDiscovery.list_steps())
+  test "list_steps/0 returns steps sorted by number" do
+    steps = StepDiscovery.list_steps()
+    numbers = Enum.map(steps, & &1.number)
+    assert numbers == Enum.sort(numbers)
   end
 end

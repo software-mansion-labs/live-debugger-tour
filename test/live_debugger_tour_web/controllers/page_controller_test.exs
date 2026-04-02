@@ -6,8 +6,8 @@ defmodule LiveDebuggerTourWeb.PageControllerTest do
     assert html_response(conn, 200) =~ "Welcome to LiveDebugger Tour"
   end
 
-  test "GET / shows empty state when no steps exist", %{conn: conn} do
+  test "GET / lists discovered tutorial steps", %{conn: conn} do
     conn = get(conn, ~p"/")
-    assert html_response(conn, 200) =~ "No tutorial steps available yet"
+    assert html_response(conn, 200) =~ "Test Step"
   end
 end

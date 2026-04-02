@@ -16,7 +16,15 @@ defmodule LiveDebuggerTour.Step do
       end
   """
 
+  @required_keys [:number, :title, :description, :path]
+
   defmacro __using__(opts) do
+    missing = @required_keys -- Keyword.keys(opts)
+
+    if missing != [] do
+      raise ArgumentError, "missing required Step keys: #{inspect(missing)}"
+    end
+
     quote do
       def __step_meta__ do
         Map.new(unquote(opts))
