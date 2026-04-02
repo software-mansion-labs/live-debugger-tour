@@ -9,7 +9,8 @@ defmodule LiveDebuggerTour.Application do
   def start(_type, _args) do
     children = [
       LiveDebuggerTourWeb.Telemetry,
-      {DNSCluster, query: Application.get_env(:live_debugger_tour, :dns_cluster_query) || :ignore},
+      {DNSCluster,
+       query: Application.get_env(:live_debugger_tour, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: LiveDebuggerTour.PubSub},
       # Start a worker by calling: LiveDebuggerTour.Worker.start_link(arg)
       # {LiveDebuggerTour.Worker, arg},
