@@ -38,13 +38,15 @@
   <% else %>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div :for={step <- @steps} class="card bg-base-200 shadow-sm">
-        <div class="card-body">
-          <h3 class="card-title">
-            <span class="badge badge-primary">{step.number}</span>
-            {step.title}
-          </h3>
-          <p class="text-base-content/70">{step.description}</p>
-        </div>
+        <.link href={step.path}>
+          <div class="card-body">
+            <h3 class="card-title">
+              <span class="badge badge-primary">{step.number}</span>
+              {step.title}
+            </h3>
+            <p class="text-base-content/70">{step.description}</p>
+          </div>
+        </.link>
       </div>
     </div>
   <% end %>
