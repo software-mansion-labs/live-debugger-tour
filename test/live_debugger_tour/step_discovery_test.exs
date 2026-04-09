@@ -7,7 +7,8 @@ defmodule LiveDebuggerTour.StepDiscoveryTest do
     steps = StepDiscovery.list_steps()
 
     assert Enum.any?(steps, fn step ->
-             step.title == "Test Step" and step.number == 1 and step.path == "/steps/test"
+             step.title == "Start Debugging" and step.number == 1 and
+               step.path == "/steps/start-debugging"
            end)
   end
 

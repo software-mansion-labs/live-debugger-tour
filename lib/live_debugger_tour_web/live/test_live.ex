@@ -1,0 +1,115 @@
+defmodule LiveDebuggerTourWeb.Live.TestLive do
+  use LiveDebuggerTourWeb, :live_view
+
+  @live_debugger_step 2
+
+  use LiveDebuggerTour.Step,
+    number: @live_debugger_step,
+    title: "Test",
+    description: "Test",
+    path: ~p"/steps/test"
+
+  alias LiveDebugger.App.Web.Helpers.Routes, as: RoutesHelper
+  alias LiveDebuggerTour.StepDiscovery
+  alias LiveDebuggerTourWeb.Components.TourComponents
+
+  @tour_steps [
+    %{
+      id: 1,
+      title: "Test",
+      description: "Test",
+      target: :inspect_button,
+      action: :spotlight,
+      icon: "hero-signal"
+    },
+    %{
+      id: 2,
+      title: "Test",
+      description: "Test",
+      target: "active-live-views",
+      action: :spotlight,
+      dismiss: "click-anywhere",
+      icon: "hero-signal"
+    }
+  ]
+
+  @impl true
+  def mount(_params, _session, socket) do
+    if connected?(socket) do
+      self()
+      |> RoutesHelper.debugger_node_inspector()
+      |> LiveDebugger.Tour.redirect()
+    end
+
+    tour_steps = StepDiscovery.list_steps()
+
+    prev_page =
+      if @live_debugger_step == 1 do
+        ~p"/"
+      else
+        tour_steps
+        |> Enum.at(@live_debugger_step - 2, %{})
+        |> Map.get(:path)
+      end
+
+    next_page =
+      tour_steps
+      |> Enum.at(@live_debugger_step, %{})
+      |> Map.get(:path)
+
+    {:ok,
+     assign(socket,
+       page_title: "Test",
+       page_number: @live_debugger_step,
+       current_step: nil,
+       completed_steps: MapSet.new(),
+       tour_steps: @tour_steps,
+       prev_page: prev_page,
+       next_page: next_page
+     )}
+  end
+
+  @impl true
+  def render(assigns) do
+    ~H"""
+    <Layouts.app flash={@flash}>
+      <TourComponents.header
+        number={@page_number}
+        name="Start Debugging"
+        description="Open the LiveDebugger panel alongside this page and follow the guided steps
+          below. Each button will spotlight a part of the debugger UI."
+      />
+      <TourComponents.progress_bar tour_steps={@tour_steps} completed_steps={@completed_steps} />
+
+      <div id="tour-cards" class="space-y-4">
+        <TourComponents.tour_step
+          :for={step <- @tour_steps}
+          step={step}
+          completed={MapSet.member?(@completed_steps, step.id)}
+        />
+      </div>
+
+      <TourComponents.clear_spotlight_button :if={@current_step != nil} />
+
+      <div class="flex justify-center gap-3">
+        <TourComponents.restart_page />
+        <TourComponents.reload_debugger url={RoutesHelper.debugger_node_inspector(self())} />
+      </div>
+
+      <TourComponents.naviation prev_page={@prev_page} next_page={@next_page} />
+    </Layouts.app>
+    """
+  end
+
+  @impl true
+  def handle_event("activate_step", %{"step" => step_id}, socket) do
+    {:noreply,
+     socket
+     |> assign(:current_step, step_id)
+     |> update(:completed_steps, &MapSet.put(&1, step_id))}
+  end
+
+  def handle_event("clear_tour", _params, socket) do
+    {:noreply, assign(socket, :current_step, nil)}
+  end
+end
