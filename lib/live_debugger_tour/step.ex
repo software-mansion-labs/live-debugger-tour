@@ -3,8 +3,11 @@ defmodule LiveDebuggerTour.Step do
   Macro for declaring a LiveView tutorial step.
 
   Provides step metadata for auto-discovery, shared mount logic via
-  `step_assigns/2`, and default `handle_event` callbacks for tour
-  interaction ("activate_step" and "clear_tour").
+  `step_assigns/2`, URL-persisted progress via `handle_params`, and
+  default `handle_event` callbacks for tour interaction.
+
+  Completed steps are persisted in the URL query string (`?completed=1,2,3`)
+  so progress survives page refresh.
 
   ## Usage
 
@@ -28,12 +31,37 @@ defmodule LiveDebuggerTour.Step do
           ~H"..."
         end
 
-        # handle_event for "activate_step" and "clear_tour" are
-        # injected automatically. Override with defoverridable if needed.
+        # handle_params, handle_event for "activate_step" and "clear_tour"
+        # are injected automatically. Override with defoverridable if needed.
       end
   """
 
   @required_keys [:number, :title, :description, :path]
+
+  @doc """
+  Parses the `completed` query param into a MapSet of step IDs.
+  """
+  def parse_completed(nil), do: MapSet.new()
+  def parse_completed(""), do: MapSet.new()
+
+  def parse_completed(str) when is_binary(str) do
+    str
+    |> String.split(",")
+    |> Enum.map(&String.to_integer/1)
+    |> MapSet.new()
+  end
+
+  @doc """
+  Builds a step path with completed steps encoded as a query param.
+  """
+  def build_path(step_path, completed) do
+    if MapSet.size(completed) > 0 do
+      completed_str = completed |> MapSet.to_list() |> Enum.sort() |> Enum.join(",")
+      step_path <> "?" <> URI.encode_query(%{"completed" => completed_str})
+    else
+      step_path
+    end
+  end
 
   defmacro __using__(opts) do
     missing = @required_keys -- Keyword.keys(opts)
@@ -65,6 +93,7 @@ defmodule LiveDebuggerTour.Step do
         Phoenix.Component.assign(socket,
           page_title: meta.title,
           page_number: meta.number,
+          step_path: meta.path,
           current_step: nil,
           completed_steps: MapSet.new(),
           tour_steps: tour_steps,
@@ -74,18 +103,29 @@ defmodule LiveDebuggerTour.Step do
       end
 
       @impl true
+      def handle_params(params, _uri, socket) do
+        completed_steps = LiveDebuggerTour.Step.parse_completed(params["completed"])
+        {:noreply, Phoenix.Component.assign(socket, :completed_steps, completed_steps)}
+      end
+
+      @impl true
       def handle_event("activate_step", %{"step" => step_id}, socket) do
+        completed = MapSet.put(socket.assigns.completed_steps, step_id)
+
         {:noreply,
          socket
          |> Phoenix.Component.assign(:current_step, step_id)
-         |> Phoenix.Component.update(:completed_steps, &MapSet.put(&1, step_id))}
+         |> Phoenix.LiveView.push_patch(
+           to: LiveDebuggerTour.Step.build_path(socket.assigns.step_path, completed),
+           replace: true
+         )}
       end
 
       def handle_event("clear_tour", _params, socket) do
         {:noreply, Phoenix.Component.assign(socket, :current_step, nil)}
       end
 
-      defoverridable handle_event: 3
+      defoverridable handle_params: 3, handle_event: 3
     end
   end
 end

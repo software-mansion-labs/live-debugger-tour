@@ -58,6 +58,30 @@ defmodule LiveDebuggerTourWeb.Live.StartDebuggingLiveTest do
     end
   end
 
+  describe "URL state persistence" do
+    test "completed steps are restored from query params", %{conn: conn} do
+      {:ok, view, _html} = live(conn, "/steps/start-debugging?completed=1%2C2")
+      assert has_element?(view, "#tour-step-1.ring-2")
+      assert has_element?(view, "#tour-step-2.ring-2")
+      refute has_element?(view, "#tour-step-3.ring-2")
+    end
+
+    test "activating a step updates the URL with completed param", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/steps/start-debugging")
+
+      view |> element("#tour-btn-1") |> render_click()
+      assert_patched(view, "/steps/start-debugging?completed=1")
+    end
+
+    test "activating multiple steps accumulates in URL", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/steps/start-debugging")
+
+      view |> element("#tour-btn-1") |> render_click()
+      view |> element("#tour-btn-3") |> render_click()
+      assert_patched(view, "/steps/start-debugging?completed=1%2C3")
+    end
+  end
+
   describe "navigation" do
     test "has a link back to the home page", %{conn: conn} do
       {:ok, view, _html} = live(conn, ~p"/steps/start-debugging")

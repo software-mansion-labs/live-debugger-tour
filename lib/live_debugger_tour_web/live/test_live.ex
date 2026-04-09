@@ -57,7 +57,7 @@ defmodule LiveDebuggerTourWeb.Live.TestLive do
       <TourComponents.clear_spotlight_button :if={@current_step != nil} />
 
       <div class="flex justify-center gap-3">
-        <TourComponents.restart_page />
+        <TourComponents.restart_page url={@step_path} />
         <TourComponents.reload_debugger url={RoutesHelper.debugger_node_inspector(self())} />
       </div>
 
