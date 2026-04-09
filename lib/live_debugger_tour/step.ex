@@ -2,9 +2,13 @@ defmodule LiveDebuggerTour.Step do
   @moduledoc """
   Macro for declaring a LiveView tutorial step.
 
+  Provides step metadata for auto-discovery, shared mount logic via
+  `step_assigns/2`, and default `handle_event` callbacks for tour
+  interaction ("activate_step" and "clear_tour").
+
   ## Usage
 
-      defmodule LiveDebuggerTourWeb.Steps.HelloWorldLive do
+      defmodule LiveDebuggerTourWeb.Live.HelloWorldLive do
         use LiveDebuggerTourWeb, :live_view
         use LiveDebuggerTour.Step,
           number: 1,
@@ -12,7 +16,20 @@ defmodule LiveDebuggerTour.Step do
           description: "Your first LiveView",
           path: "/steps/hello-world"
 
-        # ... LiveView implementation
+        @tour_steps [...]
+
+        @impl true
+        def mount(_params, _session, socket) do
+          {:ok, step_assigns(socket, @tour_steps)}
+        end
+
+        @impl true
+        def render(assigns) do
+          ~H"..."
+        end
+
+        # handle_event for "activate_step" and "clear_tour" are
+        # injected automatically. Override with defoverridable if needed.
       end
   """
 
@@ -29,6 +46,46 @@ defmodule LiveDebuggerTour.Step do
       def __step_meta__ do
         Map.new(unquote(opts))
       end
+
+      @doc false
+      def step_assigns(socket, tour_steps, opts \\ []) do
+        meta = __step_meta__()
+
+        if Phoenix.LiveView.connected?(socket) do
+          url =
+            Keyword.get_lazy(opts, :redirect_url, fn ->
+              LiveDebugger.App.Web.Helpers.Routes.debugger_node_inspector(self())
+            end)
+
+          LiveDebugger.Tour.redirect(url)
+        end
+
+        {prev_page, next_page} = LiveDebuggerTour.StepDiscovery.step_navigation(meta.number)
+
+        Phoenix.Component.assign(socket,
+          page_title: meta.title,
+          page_number: meta.number,
+          current_step: nil,
+          completed_steps: MapSet.new(),
+          tour_steps: tour_steps,
+          prev_page: prev_page,
+          next_page: next_page
+        )
+      end
+
+      @impl true
+      def handle_event("activate_step", %{"step" => step_id}, socket) do
+        {:noreply,
+         socket
+         |> Phoenix.Component.assign(:current_step, step_id)
+         |> Phoenix.Component.update(:completed_steps, &MapSet.put(&1, step_id))}
+      end
+
+      def handle_event("clear_tour", _params, socket) do
+        {:noreply, Phoenix.Component.assign(socket, :current_step, nil)}
+      end
+
+      defoverridable handle_event: 3
     end
   end
 end

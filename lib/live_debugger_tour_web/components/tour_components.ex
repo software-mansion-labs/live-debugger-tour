@@ -1,9 +1,9 @@
 defmodule LiveDebuggerTourWeb.Components.TourComponents do
-  use Phoenix.Component
+  @moduledoc """
+  Provides UI components for tour pages.
+  """
+  use LiveDebuggerTourWeb, :html
 
-  import LiveDebuggerTourWeb.CoreComponents
-
-  alias Phoenix.LiveView.JS
   alias LiveDebugger.Tour
 
   attr :number, :integer, required: true
@@ -106,7 +106,12 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
       class="flex justify-between items-center mt-10 pt-6 border-t border-base-300"
     >
       <.link navigate={@prev_page} class="btn btn-ghost btn-sm">
-        <.icon name="hero-arrow-left" class="size-4" /> Previous Page
+        <.icon name="hero-arrow-left" class="size-4" />
+        <%= if @prev_page == ~p"/" do %>
+          Back Home
+        <% else %>
+          Previous Page
+        <% end %>
       </.link>
       <.link :if={@next_page} navigate={@next_page} class="btn btn-ghost btn-sm">
         Next Page <.icon name="hero-arrow-right" class="size-4" />
