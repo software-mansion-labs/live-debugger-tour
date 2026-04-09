@@ -7,7 +7,7 @@
     <p class="py-6 text-lg text-base-content/70">
       An interactive, step-by-step tutorial for exploring <strong>LiveDebugger</strong>
       &ndash; a debugging tool for Phoenix LiveView.
-      Each step introduces a new concept with a hands-on example you can inspect
+      Each page introduces a new concept with a hands-on example you can inspect
       and debug in real time.
     </p>
     <div class="flex justify-center">
@@ -17,23 +17,23 @@
 </div>
 
 <div class="container mx-auto px-4 pb-16 max-w-4xl">
-  <h2 class="text-2xl font-semibold mb-6">Tutorial Steps</h2>
+  <h2 class="text-2xl font-semibold mb-6">Tutorial Pages</h2>
 
-  <%= if @steps == [] do %>
+  <%= if @pages == [] do %>
     <div class="alert">
       <.icon name="hero-information-circle" class="bg-info h-6 w-6 shrink-0" />
-      <span>No tutorial steps available yet. Check back soon!</span>
+      <span>No tutorial pages available yet. Check back soon!</span>
     </div>
   <% else %>
     <div class="grid grid-cols-1 gap-6">
-      <div :for={step <- @steps} class="card bg-base-200 shadow-sm">
-        <.link href={step.path}>
+      <div :for={page <- @pages} class="card bg-base-200 shadow-sm">
+        <.link href={page.path}>
           <div class="card-body">
             <h3 class="card-title">
-              <span class="badge badge-primary">{step.number}</span>
-              {step.title}
+              <span class="badge badge-primary">{page.number}</span>
+              {page.title}
             </h3>
-            <p class="text-base-content/70">{step.description}</p>
+            <p class="text-base-content/70">{page.description}</p>
           </div>
         </.link>
       </div>

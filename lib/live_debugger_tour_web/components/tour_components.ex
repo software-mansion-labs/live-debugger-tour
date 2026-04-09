@@ -102,7 +102,7 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
   def navigation(assigns) do
     ~H"""
     <div
-      id="step-navigation"
+      id="page-navigation"
       class="flex justify-between items-center mt-10 pt-6 border-t border-base-300"
     >
       <.link navigate={@prev_page} class="btn btn-ghost btn-sm">

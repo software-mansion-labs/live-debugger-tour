@@ -1,12 +1,12 @@
 defmodule LiveDebuggerTourWeb.Live.StartDebuggingLive do
   use LiveDebuggerTourWeb, :live_view
 
-  use LiveDebuggerTour.Step,
+  use LiveDebuggerTour.Page,
     number: 1,
     title: "Start Debugging",
     description:
       "Explore the Node Info panel to identify the process PID, module path, and learn how to jump from the debugger to the code editor.",
-    path: ~p"/steps/start-debugging"
+    path: ~p"/pages/start-debugging"
 
   alias LiveDebugger.App.Web.Helpers.Routes, as: RoutesHelper
   alias LiveDebuggerTourWeb.Components.TourComponents
@@ -45,7 +45,7 @@ defmodule LiveDebuggerTourWeb.Live.StartDebuggingLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, step_assigns(socket, @tour_steps)}
+    {:ok, tour_page_assigns(socket, @tour_steps)}
   end
 
   @impl true
@@ -71,7 +71,7 @@ defmodule LiveDebuggerTourWeb.Live.StartDebuggingLive do
       <TourComponents.clear_spotlight_button :if={@current_step != nil} />
 
       <div class="flex justify-center gap-3">
-        <TourComponents.restart_page url={@step_path} />
+        <TourComponents.restart_page url={@page_path} />
         <TourComponents.reload_debugger url={RoutesHelper.debugger_node_inspector(self())} />
       </div>
 

@@ -1,11 +1,11 @@
 defmodule LiveDebuggerTourWeb.Live.TestLive do
   use LiveDebuggerTourWeb, :live_view
 
-  use LiveDebuggerTour.Step,
+  use LiveDebuggerTour.Page,
     number: 2,
     title: "Test",
     description: "Test",
-    path: ~p"/steps/test"
+    path: ~p"/pages/test"
 
   alias LiveDebugger.App.Web.Helpers.Routes, as: RoutesHelper
   alias LiveDebuggerTourWeb.Components.TourComponents
@@ -32,7 +32,7 @@ defmodule LiveDebuggerTourWeb.Live.TestLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, step_assigns(socket, @tour_steps)}
+    {:ok, tour_page_assigns(socket, @tour_steps)}
   end
 
   @impl true
@@ -57,7 +57,7 @@ defmodule LiveDebuggerTourWeb.Live.TestLive do
       <TourComponents.clear_spotlight_button :if={@current_step != nil} />
 
       <div class="flex justify-center gap-3">
-        <TourComponents.restart_page url={@step_path} />
+        <TourComponents.restart_page url={@page_path} />
         <TourComponents.reload_debugger url={RoutesHelper.debugger_node_inspector(self())} />
       </div>
 

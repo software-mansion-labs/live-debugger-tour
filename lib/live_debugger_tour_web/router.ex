@@ -19,8 +19,8 @@ defmodule LiveDebuggerTourWeb.Router do
 
     get "/", PageController, :home
 
-    live "/steps/start-debugging", Live.StartDebuggingLive
-    live "/steps/test", Live.TestLive
+    live "/pages/start-debugging", Live.StartDebuggingLive
+    live "/pages/test", Live.TestLive
   end
 
   # Other scopes may use custom stacks.

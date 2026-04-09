@@ -2,7 +2,7 @@ defmodule LiveDebuggerTourWeb.PageController do
   use LiveDebuggerTourWeb, :controller
 
   def home(conn, _params) do
-    steps = LiveDebuggerTour.StepDiscovery.list_steps()
-    render(conn, :home, steps: steps)
+    pages = LiveDebuggerTour.PageDiscovery.list_pages()
+    render(conn, :home, pages: pages)
   end
 end
