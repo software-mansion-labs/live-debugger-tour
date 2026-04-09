@@ -37,7 +37,7 @@ defmodule LiveDebuggerTourWeb.Live.StartDebuggingLiveTest do
       {:ok, view, _html} = live(conn, ~p"/steps/start-debugging")
 
       view |> element("#tour-btn-1") |> render_click()
-      assert has_element?(view, "#tour-progress .step-primary")
+      assert has_element?(view, "#tour-progress .step-success")
     end
 
     test "clear button appears when a step is active", %{conn: conn} do

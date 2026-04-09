@@ -96,7 +96,7 @@ defmodule LiveDebuggerTourWeb.Live.TestLive do
         <TourComponents.reload_debugger url={RoutesHelper.debugger_node_inspector(self())} />
       </div>
 
-      <TourComponents.naviation prev_page={@prev_page} next_page={@next_page} />
+      <TourComponents.navigation prev_page={@prev_page} next_page={@next_page} />
     </Layouts.app>
     """
   end

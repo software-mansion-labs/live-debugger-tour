@@ -99,7 +99,7 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
   attr :prev_page, :string, required: true
   attr :next_page, :string, required: true
 
-  def naviation(assigns) do
+  def navigation(assigns) do
     ~H"""
     <div
       id="step-navigation"
