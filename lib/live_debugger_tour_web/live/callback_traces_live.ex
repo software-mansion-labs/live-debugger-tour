@@ -1,16 +1,12 @@
 defmodule LiveDebuggerTourWeb.Live.CallbackTracesLive do
   use LiveDebuggerTourWeb, :live_view
 
-  @live_debugger_step 3
-  @page_name "Callback Traces"
-
-  use LiveDebuggerTour.Step,
-    number: @live_debugger_step,
-    title: @page_name,
+  use LiveDebuggerTour.Page,
+    number: 3,
+    title: "Callback Traces",
     description: "Explore LiveView lifecycle with recorded traces.",
-    path: ~p"/steps/callback-traces"
+    path: ~p"/pages/callback-traces"
 
-  alias LiveDebuggerTour.StepDiscovery
   alias LiveDebugger.App.Web.Helpers.Routes, as: RoutesHelper
   alias LiveDebuggerTourWeb.Components.TourComponents
 
@@ -22,6 +18,7 @@ defmodule LiveDebuggerTourWeb.Live.CallbackTracesLive do
         "Callback tracing allows you to monitor function calls in your LiveView app. You can inspect a specific node in the Node Inspector or monitor all nodes via Global Traces.",
       target: :callback_traces_section,
       action: :spotlight,
+      dismiss: "click-anywhere",
       icon: "hero-signal"
     },
     %{
@@ -31,6 +28,7 @@ defmodule LiveDebuggerTourWeb.Live.CallbackTracesLive do
         "Each trace displays the callback name, an argument preview, timestamp, and execution time. Click a trace to expand it to see detailed arguments, copy them, or open a fullscreen view.",
       target: :navbar,
       action: :spotlight,
+      dismiss: "click-anywhere",
       icon: "hero-information-circle"
     },
     %{
@@ -40,6 +38,7 @@ defmodule LiveDebuggerTourWeb.Live.CallbackTracesLive do
         "Tracing has two states: 'Started' for live trace streams (filters disabled), and 'Stopped' to freeze the view, apply filters, and refresh manually.",
       target: :callback_traces_toggle_tracing,
       action: :spotlight,
+      dismiss: "click-anywhere",
       icon: "hero-play-pause"
     },
     %{
@@ -49,6 +48,7 @@ defmodule LiveDebuggerTourWeb.Live.CallbackTracesLive do
         "When tracing is stopped, use filters to narrow down results. You can filter by specific callbacks (like 'handle_event') or set Execution Time limits to find bottlenecks.",
       target: :callback_traces_filters_button,
       action: :spotlight,
+      dismiss: "click-anywhere",
       icon: "hero-funnel"
     },
     %{
@@ -58,9 +58,11 @@ defmodule LiveDebuggerTourWeb.Live.CallbackTracesLive do
         "In Global Traces, you can search through trace arguments. The tool will automatically expand structs and highlight all occurrences of your searched phrase.",
       target: :callback_traces_search_bar,
       action: :spotlight,
+      dismiss: "click-anywhere",
       icon: "hero-magnifying-glass"
     }
   ]
+
   @impl true
   def mount(_params, _session, socket) do
     if connected?(socket) do
@@ -69,32 +71,7 @@ defmodule LiveDebuggerTourWeb.Live.CallbackTracesLive do
       |> LiveDebugger.Tour.redirect()
     end
 
-    tour_steps = StepDiscovery.list_steps()
-
-    prev_page =
-      if @live_debugger_step == 1 do
-        ~p"/"
-      else
-        tour_steps
-        |> Enum.at(@live_debugger_step - 2, %{})
-        |> Map.get(:path)
-      end
-
-    next_page =
-      tour_steps
-      |> Enum.at(@live_debugger_step, %{})
-      |> Map.get(:path)
-
-    {:ok,
-     assign(socket,
-       page_title: @page_name,
-       page_number: @live_debugger_step,
-       current_step: nil,
-       completed_steps: MapSet.new(),
-       tour_steps: @tour_steps,
-       prev_page: prev_page,
-       next_page: next_page
-     )}
+    {:ok, tour_page_assigns(socket, @tour_steps)}
   end
 
   @impl true
@@ -104,8 +81,7 @@ defmodule LiveDebuggerTourWeb.Live.CallbackTracesLive do
       <TourComponents.header
         number={@page_number}
         name="Callback Traces"
-        description="Open the LiveDebugger panel alongside this page and follow the guided steps
-          below. Each button will spotlight a part of the debugger UI."
+        description="Learn how to monitor function calls, inspect arguments, and find performance bottlenecks in your LiveView app. Open the LiveDebugger panel and follow the steps below."
       />
       <TourComponents.progress_bar tour_steps={@tour_steps} completed_steps={@completed_steps} />
 
@@ -120,24 +96,12 @@ defmodule LiveDebuggerTourWeb.Live.CallbackTracesLive do
       <TourComponents.clear_spotlight_button :if={@current_step != nil} />
 
       <div class="flex justify-center gap-3">
-        <TourComponents.restart_page />
+        <TourComponents.restart_page url={@page_path} />
         <TourComponents.reload_debugger url={RoutesHelper.debugger_node_inspector(self())} />
       </div>
 
       <TourComponents.navigation prev_page={@prev_page} next_page={@next_page} />
     </Layouts.app>
     """
-  end
-
-  @impl true
-  def handle_event("activate_step", %{"step" => step_id}, socket) do
-    {:noreply,
-     socket
-     |> assign(:current_step, step_id)
-     |> update(:completed_steps, &MapSet.put(&1, step_id))}
-  end
-
-  def handle_event("clear_tour", _params, socket) do
-    {:noreply, assign(socket, :current_step, nil)}
   end
 end
