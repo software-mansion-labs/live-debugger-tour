@@ -18,9 +18,13 @@ defmodule LiveDebuggerTourWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+  end
 
-    live "/pages/start-debugging", Live.StartDebuggingLive
-    live "/pages/test", Live.TestLive
+  scope "/" do
+    pipe_through :browser
+
+    require LiveDebuggerTour.PageDiscovery
+    LiveDebuggerTour.PageDiscovery.routes()
   end
 
   # Other scopes may use custom stacks.

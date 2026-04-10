@@ -15,8 +15,7 @@ defmodule LiveDebuggerTour.Page do
         use LiveDebuggerTour.Page,
           number: 1,
           title: "Hello World",
-          description: "Your first LiveView",
-          path: "/pages/hello-world"
+          description: "Your first LiveView"
 
         @tour_steps [...]
 
@@ -32,7 +31,7 @@ defmodule LiveDebuggerTour.Page do
       end
   """
 
-  @required_keys [:number, :title, :description, :path]
+  @required_keys [:number, :title, :description]
 
   defmacro __using__(opts) do
     missing = @required_keys -- Keyword.keys(opts)
@@ -41,9 +40,17 @@ defmodule LiveDebuggerTour.Page do
       raise ArgumentError, "missing required Page keys: #{inspect(missing)}"
     end
 
+    title = Keyword.fetch!(opts, :title)
+    path = "/pages/#{LiveDebuggerTour.Page.slugify(title)}"
+
     quote do
+      @after_compile {LiveDebuggerTour.PageDiscovery, :after_compile_reset}
+
       def __page_meta__ do
-        Map.new(unquote(opts))
+        unquote(opts)
+        |> Map.new()
+        |> Map.put(:path, unquote(path))
+        |> Map.put(:module, __MODULE__)
       end
 
       @doc false
@@ -53,6 +60,15 @@ defmodule LiveDebuggerTour.Page do
         LiveDebuggerTour.Page.tour_page_assigns(socket, tour_steps, meta, opts)
       end
     end
+  end
+
+  @doc "Converts a title string to a URL-safe slug."
+  def slugify(title) do
+    title
+    |> String.downcase()
+    |> String.replace(~r/[^\w\s-]/u, "")
+    |> String.replace(~r/[\s_]+/, "-")
+    |> String.trim("-")
   end
 
   def tour_page_assigns(socket, tour_steps, meta, opts \\ []) do

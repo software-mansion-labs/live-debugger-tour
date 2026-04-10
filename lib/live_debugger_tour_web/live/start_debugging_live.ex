@@ -5,8 +5,7 @@ defmodule LiveDebuggerTourWeb.Live.StartDebuggingLive do
     number: 1,
     title: "Start Debugging",
     description:
-      "Explore the Node Info panel to identify the process PID, module path, and learn how to jump from the debugger to the code editor.",
-    path: ~p"/pages/start-debugging"
+      "Explore the Node Info panel to identify the process PID, module path, and learn how to jump from the debugger to the code editor."
 
   alias LiveDebugger.App.Web.Helpers.Routes, as: RoutesHelper
   alias LiveDebuggerTourWeb.Components.TourComponents
@@ -54,7 +53,7 @@ defmodule LiveDebuggerTourWeb.Live.StartDebuggingLive do
     <Layouts.app flash={@flash}>
       <TourComponents.header
         number={@page_number}
-        name="Start Debugging"
+        name={@page_title}
         description="Open the LiveDebugger panel alongside this page and follow the guided steps
           below. Each button will spotlight a part of the debugger UI."
       />

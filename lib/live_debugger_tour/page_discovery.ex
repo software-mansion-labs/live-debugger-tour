@@ -10,6 +10,66 @@ defmodule LiveDebuggerTour.PageDiscovery do
   @cache_key {__MODULE__, :pages}
 
   @doc """
+  Generates `live` route definitions for all discovered page modules.
+
+  Intended to be called inside a router scope:
+
+      scope "/" do
+        pipe_through :browser
+        LiveDebuggerTour.PageDiscovery.routes()
+      end
+  """
+  defmacro routes do
+    pages = LiveDebuggerTour.PageDiscovery.discover_pages_at_compile_time()
+
+    live_files = Path.wildcard("lib/live_debugger_tour_web/live/**/*_live.ex")
+
+    external_resources =
+      for file <- live_files do
+        abs_path = Path.expand(file)
+
+        quote do
+          @external_resource unquote(abs_path)
+        end
+      end
+
+    route_defs =
+      for page <- pages do
+        quote do
+          live unquote(page.path), unquote(page.module)
+        end
+      end
+
+    {:__block__, [], external_resources ++ route_defs}
+  end
+
+  @doc false
+  def discover_pages_at_compile_time do
+    "lib/live_debugger_tour_web/live"
+    |> Path.join("**/*_live.ex")
+    |> Path.wildcard()
+    |> Enum.flat_map(fn file ->
+      with {:ok, module} <- extract_module(file),
+           {:module, _} <- Code.ensure_compiled(module),
+           true <- function_exported?(module, :__page_meta__, 0) do
+        [module.__page_meta__()]
+      else
+        _ -> []
+      end
+    end)
+    |> Enum.sort_by(& &1.number)
+  end
+
+  defp extract_module(file) do
+    content = File.read!(file)
+
+    case Regex.run(~r/defmodule\s+([\w.]+)/, content) do
+      [_, module_str] -> {:ok, Module.concat([module_str])}
+      _ -> :error
+    end
+  end
+
+  @doc """
   Returns a sorted list of page metadata maps from all modules
   that use `LiveDebuggerTour.Page`.
   """
@@ -54,6 +114,11 @@ defmodule LiveDebuggerTour.PageDiscovery do
   """
   def reset do
     :persistent_term.erase(@cache_key)
+  end
+
+  @doc false
+  def after_compile_reset(_env, _bytecode) do
+    reset()
   end
 
   defp discover_pages do

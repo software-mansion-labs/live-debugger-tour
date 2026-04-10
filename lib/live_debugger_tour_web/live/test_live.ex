@@ -4,8 +4,7 @@ defmodule LiveDebuggerTourWeb.Live.TestLive do
   use LiveDebuggerTour.Page,
     number: 2,
     title: "Test",
-    description: "Test",
-    path: ~p"/pages/test"
+    description: "Test"
 
   alias LiveDebugger.App.Web.Helpers.Routes, as: RoutesHelper
   alias LiveDebuggerTourWeb.Components.TourComponents
