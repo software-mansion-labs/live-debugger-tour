@@ -13,6 +13,15 @@ defmodule LiveDebuggerTourWeb.Live.StartDebuggingLive do
   @tour_steps [
     %{
       id: 1,
+      title: "Open LiveDebugger",
+      description:
+        "Look for the floating bug icon button in the bottom-right corner of this page. Click it to open the LiveDebugger panel in a new tab. This button is injected automatically when LiveDebugger is added as a dependency.",
+      target: "live-debugger-debug-button",
+      action: :client_spotlight,
+      icon: "hero-bug-ant"
+    },
+    %{
+      id: 2,
       title: "PID indicator",
       description:
         "The green dot in the debugger navbar shows your LiveView's PID and confirms the debugger is connected to a live process.",
@@ -22,7 +31,7 @@ defmodule LiveDebuggerTourWeb.Live.StartDebuggingLive do
       icon: "hero-signal"
     },
     %{
-      id: 2,
+      id: 3,
       title: "Node Info panel",
       description:
         "This panel displays the module name, file path, and node type of the LiveView you are inspecting. It is your starting point for understanding which process the debugger is attached to.",
@@ -32,7 +41,7 @@ defmodule LiveDebuggerTourWeb.Live.StartDebuggingLive do
       icon: "hero-information-circle"
     },
     %{
-      id: 3,
+      id: 4,
       title: "Open in Editor",
       description:
         "The \"Open in Editor\" button jumps directly to this module's source file in your code editor. Make sure the PLUG_EDITOR environment variable is configured.",
@@ -54,8 +63,7 @@ defmodule LiveDebuggerTourWeb.Live.StartDebuggingLive do
       <TourComponents.header
         number={@page_number}
         name={@page_title}
-        description="Open the LiveDebugger panel alongside this page and follow the guided steps
-          below. Each button will spotlight a part of the debugger UI."
+        description="Follow the guided steps below to explore the key parts of the LiveDebugger interface."
       />
       <TourComponents.progress_bar tour_steps={@tour_steps} completed_steps={@completed_steps} />
 
@@ -67,6 +75,7 @@ defmodule LiveDebuggerTourWeb.Live.StartDebuggingLive do
         />
       </div>
 
+      <TourComponents.client_spotlight_hook />
       <TourComponents.clear_spotlight_button :if={@current_step != nil} />
 
       <div class="flex justify-center gap-3">

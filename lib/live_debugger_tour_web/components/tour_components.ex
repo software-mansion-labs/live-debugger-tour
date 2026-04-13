@@ -87,12 +87,86 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
     <div id="clear-tour" class="text-center mt-4">
       <button
         id="clear-tour-btn"
-        phx-click={Tour.clear_JS() |> JS.push("clear_tour")}
+        phx-click={clear_all_spotlights()}
         class="btn btn-outline btn-sm"
       >
         <.icon name="hero-x-mark" class="size-4" /> Clear spotlight
       </button>
     </div>
+    """
+  end
+
+  @doc """
+  Renders a hidden hook element that handles client-side spotlights.
+  Uses the same overlay + spotlight-target CSS as LiveDebugger's tour.
+  Include this on any page that uses `action: :client_spotlight` steps.
+  """
+  def client_spotlight_hook(assigns) do
+    ~H"""
+    <div id="client-spotlight-hook" phx-hook=".ClientSpotlight" class="hidden" phx-update="ignore">
+    </div>
+    <script :type={Phoenix.LiveView.ColocatedHook} name=".ClientSpotlight">
+      const OVERLAY_ID = 'client-tour-overlay';
+
+      function clearAll() {
+        const overlay = document.getElementById(OVERLAY_ID);
+        if (overlay) overlay.remove();
+        document.querySelectorAll('.tour-spotlight-target')
+          .forEach(el => el.classList.remove('tour-spotlight-target'));
+      }
+
+      function createOverlay() {
+        if (!document.getElementById(OVERLAY_ID)) {
+          const overlay = document.createElement('div');
+          overlay.id = OVERLAY_ID;
+          overlay.className = 'tour-overlay';
+          overlay.addEventListener('click', (e) => e.stopPropagation());
+          document.body.appendChild(overlay);
+        }
+      }
+
+      export default {
+        mounted() {
+          const controller = new AbortController();
+          this._cleanup = null;
+
+          const handler = () => {
+            clearAll();
+            this._cleanup = null;
+          };
+
+          this._cleanup = () => controller.abort();
+
+          this.el.addEventListener('tour:client-spotlight', (e) => {
+            const { target } = e.detail;
+            clearAll();
+            createOverlay();
+            const el = document.getElementById(target);
+            if (el) {
+              el.classList.add('tour-spotlight-target');
+
+              setTimeout(() => {
+                if (!controller.signal.aborted) {
+                  el.addEventListener('click', handler, {
+                    once: true,
+                    signal: controller.signal,
+                  });
+                }
+              }, 0);
+            }
+
+          });
+
+          this.el.addEventListener('tour:client-clear', () => {
+            clearAll();
+          });
+        },
+        destroyed() {
+          this._cleanup();
+          clearAll();
+        }
+      }
+    </script>
     """
   end
 
@@ -152,10 +226,23 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
     """
   end
 
+  defp tour_action(%{action: :client_spotlight, target: target}) do
+    JS.dispatch("tour:client-spotlight",
+      to: "#client-spotlight-hook",
+      detail: %{target: target}
+    )
+  end
+
   defp tour_action(%{action: :spotlight, target: target, dismiss: dismiss}),
     do: Tour.spotlight_JS(target, dismiss)
 
   defp tour_action(%{action: :spotlight, target: target}), do: Tour.spotlight_JS(target)
 
   defp tour_action(%{action: :highlight, target: target}), do: Tour.highlight(target)
+
+  defp clear_all_spotlights do
+    Tour.clear_JS()
+    |> JS.dispatch("tour:client-clear", to: "#client-spotlight-hook")
+    |> JS.push("clear_tour")
+  end
 end
