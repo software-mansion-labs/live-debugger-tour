@@ -47,6 +47,12 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
           <div class="flex-1">
             <h3 class="card-title text-base">{@step.title}</h3>
             <p class="text-sm text-base-content/70">{@step.description}</p>
+            <code
+              :if={@step[:code_snippet]}
+              class="block mt-2 px-3 py-2 text-xs bg-base-300 rounded-lg font-mono select-all"
+            >
+              {@step.code_snippet}
+            </code>
           </div>
           <button
             id={"tour-btn-#{@step.id}"}

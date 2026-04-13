@@ -44,7 +44,10 @@ defmodule LiveDebuggerTourWeb.Live.StartDebuggingLive do
       id: 4,
       title: "Open in Editor",
       description:
-        "The \"Open in Editor\" button jumps directly to this module's source file in your code editor. Make sure the PLUG_EDITOR environment variable is configured.",
+        "The \"Open in Editor\" button jumps directly to this module's source file in your code editor. " <>
+          "LiveDebugger checks ELIXIR_EDITOR, then TERM_PROGRAM (set automatically by VS Code/Zed terminals), then EDITOR. " <>
+          "For VS Code, add to your shell profile:",
+      code_snippet: "export ELIXIR_EDITOR=\"code --goto\"",
       target: :open_in_editor,
       action: :spotlight,
       icon: "hero-code-bracket"
