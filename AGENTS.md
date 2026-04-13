@@ -33,51 +33,51 @@ Each topic maps to a numbered tour step LiveView:
 - Use DaisyUI classes for UI components (cards, buttons, badges, alerts, etc.) — the project already includes DaisyUI with custom themes
 - This is a **dev-only** tutorial app — do not add production concerns (authentication, deployment, etc.)
 
-### Tour step architecture
+### Tour page architecture
 
-#### Creating a new tour step
+#### Creating a new tour page
 
-Each step is a LiveView module that uses both `LiveDebuggerTourWeb, :live_view` and `LiveDebuggerTour.Step`:
+Each page is a LiveView module that uses both `LiveDebuggerTourWeb, :live_view` and `LiveDebuggerTour.Page`:
 
 ```elixir
-defmodule LiveDebuggerTourWeb.Live.MyStepLive do
+defmodule LiveDebuggerTourWeb.Live.MyPageLive do
   use LiveDebuggerTourWeb, :live_view
-  use LiveDebuggerTour.Step,
+  use LiveDebuggerTour.Page,
     number: 1,
     title: "Start Debugging",
-    description: "Explore the Node Info panel...",
-    path: "/steps/start-debugging"
+    description: "Explore the Node Info panel..."
+
+  @tour_steps [...]
+
+  @impl true
+  def mount(_params, _session, socket) do
+    {:ok, tour_page_assigns(socket, @tour_steps)}
+  end
 
   @impl true
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash}>
-      <%!-- Step content here --%>
+      <%!-- Page content here --%>
     </Layouts.app>
     """
   end
 end
 ```
 
-Required `Step` metadata keys: `number`, `title`, `description`, `path`.
+Required `Page` metadata keys: `number`, `title`, `description`. The URL path is auto-generated from the title (e.g. "Start Debugging" becomes `/pages/start-debugging`).
 
-Steps are **auto-discovered** at runtime by `LiveDebuggerTour.StepDiscovery` — it scans all compiled modules that export `__step_meta__/0` and sorts them by number. The homepage lists all discovered steps automatically.
+Pages are **auto-discovered** at runtime by `LiveDebuggerTour.PageDiscovery` — it scans all compiled modules that export `__page_meta__/0` and sorts them by number. The homepage lists all discovered pages automatically.
 
 #### Adding a route
 
-Each step needs a route in `lib/live_debugger_tour_web/router.ex` under the `"/"` scope:
+Routes are **auto-generated** by `LiveDebuggerTour.PageDiscovery.routes()` in the router — no manual route entry is needed when creating a new page.
 
-```elixir
-live "/steps/start-debugging", Live.StartDebuggingLive
-```
+#### Page file naming convention
 
-The scope is already aliased with `LiveDebuggerTourWeb`, so use short module names.
-
-#### Step file naming convention
-
-- Module: `LiveDebuggerTourWeb.Live.<StepName>Live` (e.g. `StartDebuggingLive`)
-- File: `lib/live_debugger_tour_web/live/<step_name>_live.ex` (e.g. `start_debugging_live.ex`)
-- Path: `/steps/<step-slug>` (e.g. `/steps/start-debugging`)
+- Module: `LiveDebuggerTourWeb.Live.<PageName>Live` (e.g. `StartDebuggingLive`)
+- File: `lib/live_debugger_tour_web/live/<page_name>_live.ex` (e.g. `start_debugging_live.ex`)
+- Path: `/pages/<page-slug>` (e.g. `/pages/start-debugging`) — auto-generated from the title
 
 ### Tour API (LiveDebugger integration)
 

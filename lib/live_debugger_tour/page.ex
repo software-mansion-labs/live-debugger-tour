@@ -130,7 +130,12 @@ defmodule LiveDebuggerTour.Page do
   defp parse_completed(str) when is_binary(str) do
     str
     |> String.split(",")
-    |> Enum.map(&String.to_integer/1)
+    |> Enum.flat_map(fn s ->
+      case Integer.parse(s) do
+        {n, ""} -> [n]
+        _ -> []
+      end
+    end)
     |> MapSet.new()
   end
 

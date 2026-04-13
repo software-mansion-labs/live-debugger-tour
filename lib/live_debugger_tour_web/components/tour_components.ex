@@ -168,7 +168,7 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
           });
         },
         destroyed() {
-          this._cleanup();
+          this._cleanup?.();
           clearAll();
         }
       }

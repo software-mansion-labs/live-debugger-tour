@@ -91,20 +91,24 @@ defmodule LiveDebuggerTour.PageDiscovery do
   """
   def page_navigation(page_number) do
     pages = list_pages()
+    index = Enum.find_index(pages, &(&1.number == page_number))
 
     prev_page =
-      if page_number == 1 do
-        "/"
-      else
-        pages
-        |> Enum.at(page_number - 2, %{})
-        |> Map.get(:path)
+      cond do
+        is_nil(index) -> "/"
+        index == 0 -> "/"
+        true -> Enum.at(pages, index - 1) |> Map.get(:path)
       end
 
     next_page =
-      pages
-      |> Enum.at(page_number, %{})
-      |> Map.get(:path)
+      if index do
+        pages
+        |> Enum.at(index + 1)
+        |> then(fn
+          nil -> nil
+          page -> page.path
+        end)
+      end
 
     {prev_page, next_page}
   end
