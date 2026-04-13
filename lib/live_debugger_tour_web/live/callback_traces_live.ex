@@ -4,8 +4,7 @@ defmodule LiveDebuggerTourWeb.Live.CallbackTracesLive do
   use LiveDebuggerTour.Page,
     number: 3,
     title: "Callback Traces",
-    description: "Explore LiveView lifecycle with recorded traces.",
-    path: ~p"/pages/callback-traces"
+    description: "Explore LiveView lifecycle with recorded traces."
 
   alias LiveDebugger.App.Web.Helpers.Routes, as: RoutesHelper
   alias LiveDebuggerTourWeb.Components.TourComponents
@@ -26,9 +25,9 @@ defmodule LiveDebuggerTourWeb.Live.CallbackTracesLive do
       title: "Exploring a Single Trace",
       description:
         "Each trace displays the callback name, an argument preview, timestamp, and execution time. Click a trace to expand it to see detailed arguments, copy them, or open a fullscreen view.",
-      target: :navbar,
+      target: :callback_traces_first_trace,
       action: :spotlight,
-      dismiss: "click-anywhere",
+      dismiss: "click-target",
       icon: "hero-information-circle"
     },
     %{
@@ -38,7 +37,7 @@ defmodule LiveDebuggerTourWeb.Live.CallbackTracesLive do
         "Tracing has two states: 'Started' for live trace streams (filters disabled), and 'Stopped' to freeze the view, apply filters, and refresh manually.",
       target: :callback_traces_toggle_tracing,
       action: :spotlight,
-      dismiss: "click-anywhere",
+      dismiss: "click-target",
       icon: "hero-play-pause"
     },
     %{
