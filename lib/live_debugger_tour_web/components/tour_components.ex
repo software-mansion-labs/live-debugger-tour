@@ -232,19 +232,18 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
     """
   end
 
-  defp tour_action(%{action: :client_spotlight, target: target}) do
+  defp tour_action(%{action: {:client_spotlight, []}, target: target}) do
     JS.dispatch("tour:client-spotlight",
       to: "#client-spotlight-hook",
       detail: %{target: target}
     )
   end
 
-  defp tour_action(%{action: :spotlight, target: target, dismiss: dismiss}),
-    do: Tour.spotlight_JS(target, dismiss)
+  defp tour_action(%{action: {:spotlight, opts}, target: target}),
+    do: Tour.spotlight_JS(target, opts)
 
-  defp tour_action(%{action: :spotlight, target: target}), do: Tour.spotlight_JS(target)
-
-  defp tour_action(%{action: :highlight, target: target}), do: Tour.highlight(target)
+  defp tour_action(%{action: {:highlight, opts}, target: target}),
+    do: Tour.highlight_JS(target, opts)
 
   defp clear_all_spotlights do
     Tour.clear_JS()

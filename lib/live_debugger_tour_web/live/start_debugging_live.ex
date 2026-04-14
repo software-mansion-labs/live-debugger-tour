@@ -17,7 +17,7 @@ defmodule LiveDebuggerTourWeb.Live.StartDebuggingLive do
       description:
         "Look for the floating bug icon button in the bottom-right corner of this page. Click it to open the LiveDebugger panel in a new tab. This button is injected automatically when LiveDebugger is added as a dependency.",
       target: "live-debugger-debug-button",
-      action: :client_spotlight,
+      action: {:client_spotlight, []},
       icon: "hero-bug-ant"
     },
     %{
@@ -26,8 +26,7 @@ defmodule LiveDebuggerTourWeb.Live.StartDebuggingLive do
       description:
         "The green dot in the debugger navbar shows your LiveView's PID and confirms the debugger is connected to a live process.",
       target: :navbar_connected,
-      action: :spotlight,
-      dismiss: "click-anywhere",
+      action: {:spotlight, [dismiss: "click-anywhere"]},
       icon: "hero-signal"
     },
     %{
@@ -36,8 +35,7 @@ defmodule LiveDebuggerTourWeb.Live.StartDebuggingLive do
       description:
         "This panel displays the module name, file path, and node type of the LiveView you are inspecting. It is your starting point for understanding which process the debugger is attached to.",
       target: :node_basic_info,
-      action: :spotlight,
-      dismiss: "click-anywhere",
+      action: {:spotlight, [dismiss: "click-anywhere"]},
       icon: "hero-information-circle"
     },
     %{
@@ -49,7 +47,7 @@ defmodule LiveDebuggerTourWeb.Live.StartDebuggingLive do
           "For VS Code, add to your shell profile:",
       code_snippet: "export ELIXIR_EDITOR=\"code --goto\"",
       target: :open_in_editor,
-      action: :spotlight,
+      action: {:spotlight, []},
       icon: "hero-code-bracket"
     }
   ]
