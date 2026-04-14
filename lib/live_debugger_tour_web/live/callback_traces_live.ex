@@ -14,50 +14,45 @@ defmodule LiveDebuggerTourWeb.Live.CallbackTracesLive do
       id: 1,
       title: "Callback Traces Overview",
       description:
-        "Callback tracing allows you to monitor function calls in your LiveView app. You can inspect a specific node in the Node Inspector or monitor all nodes via Global Traces.",
+        "This feature allows you to see exactly how lifecycle functions are being called in your application. You can monitor a specific node here in the Node Inspector, or track all nodes at once using Global Traces.",
       target: :callback_traces_section,
-      action: :spotlight,
-      dismiss: "click-anywhere",
-      icon: "hero-signal"
+      action: {:spotlight, [dismiss: "click-anywhere"]},
+      icon: "hero-queue-list"
     },
     %{
       id: 2,
-      title: "Exploring a Single Trace",
+      title: "Start, Stop and Refresh",
       description:
-        "Each trace displays the callback name, an argument preview, timestamp, and execution time. Click a trace to expand it to see detailed arguments, copy them, or open a fullscreen view.",
-      target: :callback_traces_first_trace,
-      action: :spotlight,
-      dismiss: "click-target",
-      icon: "hero-information-circle"
-    },
-    %{
-      id: 3,
-      title: "Start and Stop Tracing",
-      description:
-        "Tracing has two states: 'Started' for live trace streams (filters disabled), and 'Stopped' to freeze the view, apply filters, and refresh manually.",
+        "Control the flow of traces. Started streams traces live as you interact with the app. Try stopping it - this freezes the view, allowing you to apply filters and manually load the newest traces.",
       target: :callback_traces_toggle_tracing,
-      action: :spotlight,
-      dismiss: "click-target",
+      action: {:spotlight, [dismiss: "click-anywhere"]},
       icon: "hero-play-pause"
     },
     %{
-      id: 4,
+      id: 3,
       title: "Filtering Traces",
       description:
-        "When tracing is stopped, use filters to narrow down results. You can filter by specific callbacks (like 'handle_event') or set Execution Time limits to find bottlenecks.",
+        "Find exactly what you need. Once tracing is stopped, use filters to isolate specific callbacks. You can also set Execution Time limits to easily spot performance bottlenecks.",
       target: :callback_traces_filters_button,
-      action: :spotlight,
-      dismiss: "click-anywhere",
+      action: {:spotlight, [dismiss: "click-anywhere"]},
       icon: "hero-funnel"
     },
     %{
-      id: 5,
-      title: "Searching Inside Traces",
+      id: 4,
+      title: "Trace Information",
       description:
-        "In Global Traces, you can search through trace arguments. The tool will automatically expand structs and highlight all occurrences of your searched phrase.",
+        "Analyze the details. Each trace displays the callback arity, argument preview, and execution time. Try clicking a trace to expand it, copy the arguments, open in edior or view them in fullscreen.",
+      target: :callback_traces_first_trace,
+      action: {:spotlight, [dismiss: "click-target"]},
+      icon: "hero-document-magnifying-glass"
+    },
+    %{
+      id: 5,
+      title: "Search & Highlight",
+      description:
+        "The search bar lets you query arguments directly. It automatically expands hidden structs and highlights every matching phrase, making it easy to navigate massive payloads.",
       target: :callback_traces_search_bar,
-      action: :spotlight,
-      dismiss: "click-anywhere",
+      action: {:highlight, [dismiss: "click-anywhere"]},
       icon: "hero-magnifying-glass"
     }
   ]
