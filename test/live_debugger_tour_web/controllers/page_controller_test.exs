@@ -8,6 +8,6 @@ defmodule LiveDebuggerTourWeb.PageControllerTest do
 
   test "GET / lists discovered tutorial steps", %{conn: conn} do
     conn = get(conn, ~p"/")
-    assert html_response(conn, 200) =~ "Test Step"
+    assert html_response(conn, 200) =~ "Start Debugging"
   end
 end
