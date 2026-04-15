@@ -15,7 +15,7 @@ defmodule LiveDebuggerTourWeb.Live.DeadLiveviewExceptionsLive do
       title: "Note the current PID",
       description:
         "Open the LiveDebugger and look at the green \"Monitored PID\" badge in the navbar. " <>
-          "Remember this PID — after the crash, you'll see it change to a \"Disconnected\" state.",
+          "Remember this PID - after the crash, you'll see it change to a \"Disconnected\" state.",
       target: :navbar_connected,
       action: {:spotlight, [dismiss: "click-anywhere"]},
       icon: "hero-signal"
@@ -45,7 +45,10 @@ defmodule LiveDebuggerTourWeb.Live.DeadLiveviewExceptionsLive do
     %{
       id: 4,
       title: "Inspect raised error",
-      description: "",
+      description:
+        "The Callback Traces panel shows the exception that killed the process. " <>
+          "Expand the trace to see the full error message, the module and function where it was raised, " <>
+          "and the complete stack trace.",
       target: :callback_traces_first_trace,
       action: {:spotlight, [dismiss: "click-anywhere"]},
       icon: "hero-magnifying-glass"
