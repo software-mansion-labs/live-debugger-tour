@@ -23,6 +23,9 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
   attr :step, :map, required: true
   attr :completed, :boolean, required: true
 
+  slot :button
+  slot :inner_block
+
   def tour_step(assigns) do
     ~H"""
     <div
@@ -55,6 +58,7 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
             </code>
           </div>
           <button
+            :if={@button == []}
             id={"tour-btn-#{@step.id}"}
             phx-click={tour_action(@step) |> JS.push("activate_step", value: %{step: @step.id})}
             class={[
@@ -64,7 +68,9 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
           >
             <.icon name="hero-viewfinder-circle" class="size-4" /> Spotlight
           </button>
+          {render_slot(@button, @step |> Map.put(:completed, @completed))}
         </div>
+        {render_slot(@inner_block, @step |> Map.put(:completed, @completed))}
       </div>
     </div>
     """

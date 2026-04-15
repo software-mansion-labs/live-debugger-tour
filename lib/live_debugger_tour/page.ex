@@ -105,8 +105,13 @@ defmodule LiveDebuggerTour.Page do
     {:halt, Phoenix.Component.assign(socket, :completed_steps, completed_steps)}
   end
 
-  defp handle_event_hook("activate_step", %{"step" => step_id}, socket) do
-    completed = MapSet.put(socket.assigns.completed_steps, step_id)
+  defp handle_event_hook(event, %{"step" => step_id}, socket)
+       when event in ["activate_step", "deactivate_step"] do
+    completed =
+      case event do
+        "activate_step" -> MapSet.put(socket.assigns.completed_steps, step_id)
+        "deactivate_step" -> MapSet.delete(socket.assigns.completed_steps, step_id)
+      end
 
     {:halt,
      socket

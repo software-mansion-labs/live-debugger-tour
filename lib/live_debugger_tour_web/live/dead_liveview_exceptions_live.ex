@@ -44,11 +44,9 @@ defmodule LiveDebuggerTourWeb.Live.DeadLiveviewExceptionsLive do
     },
     %{
       id: 4,
-      title: "Inspect the last state",
-      description:
-        "The Node Info panel still displays the module name and path of the dead process. " <>
-          "You can browse its assigns to see exactly what state it held at the moment of the crash.",
-      target: :node_basic_info,
+      title: "Inspect raised error",
+      description: "",
+      target: :callback_traces_first_trace,
       action: {:spotlight, [dismiss: "click-anywhere"]},
       icon: "hero-magnifying-glass"
     },
@@ -74,7 +72,7 @@ defmodule LiveDebuggerTourWeb.Live.DeadLiveviewExceptionsLive do
       |> tour_page_assigns(@tour_steps, skip_redirect: true)
       |> assign(counter: 0)
 
-    if not MapSet.member?(completed, 2) do
+    if connected?(socket) and not MapSet.member?(completed, 2) do
       self()
       |> LiveDebugger.App.Web.Helpers.Routes.debugger_node_inspector()
       |> LiveDebugger.Tour.redirect()
@@ -94,28 +92,6 @@ defmodule LiveDebuggerTourWeb.Live.DeadLiveviewExceptionsLive do
       />
       <TourComponents.progress_bar tour_steps={@tour_steps} completed_steps={@completed_steps} />
 
-      <div class="card shadow-sm my-6">
-        <div class="card-body">
-          <h3 class="card-title text-base">
-            <.icon name="hero-beaker" class="size-5 text-primary" /> Interactive Demo
-          </h3>
-          <p class="text-sm text-base-content/70">
-            Use the counter to create some state, then crash the process with "Boom!" to see DeadView mode in action.
-          </p>
-          <div class="flex items-center gap-4 mt-3">
-            <div class="badge badge-lg badge-outline font-mono">
-              counter: {@counter}
-            </div>
-            <button id="increment-button" phx-click="increment" class="btn btn-sm btn-soft">
-              <.icon name="hero-plus" class="size-4" /> Increment
-            </button>
-            <button id="boom-button" phx-update="ignore" phx-click="boom" class="btn btn-sm btn-error">
-              <.icon name="hero-fire" class="size-4" /> Boom!
-            </button>
-          </div>
-        </div>
-      </div>
-
       <div class="alert alert-info mb-6">
         <.icon name="hero-information-circle" class="size-5" />
         <div>
@@ -131,7 +107,36 @@ defmodule LiveDebuggerTourWeb.Live.DeadLiveviewExceptionsLive do
 
       <div id="tour-cards" class="space-y-4">
         <TourComponents.tour_step
-          :for={step <- @tour_steps}
+          step={Enum.at(@tour_steps, 0)}
+          completed={MapSet.member?(@completed_steps, 1)}
+        />
+        <TourComponents.tour_step
+          :let={step}
+          step={Enum.at(@tour_steps, 1)}
+          completed={MapSet.member?(@completed_steps, 2)}
+        >
+          <:button :let={step}>
+            <button
+              id="tour-btn-2"
+              phx-click={
+                if(step.completed,
+                  do: JS.push("deactivate_step", value: %{step: step.id}),
+                  else: JS.push("activate_step", value: %{step: step.id})
+                )
+              }
+              class="btn btn-sm btn-soft"
+            >
+              <.icon name="hero-viewfinder-circle" class="size-4" /> {if(step.completed,
+                do: "Hide",
+                else: "Show"
+              )} demo
+            </button>
+          </:button>
+          <.interactive_demo_section :if={step.completed} counter={@counter} />
+        </TourComponents.tour_step>
+
+        <TourComponents.tour_step
+          :for={step <- @tour_steps |> Enum.drop(2)}
           step={step}
           completed={MapSet.member?(@completed_steps, step.id)}
         />
@@ -157,5 +162,33 @@ defmodule LiveDebuggerTourWeb.Live.DeadLiveviewExceptionsLive do
   @impl true
   def handle_event("boom", _params, _socket) do
     raise RuntimeError, "Boom! This crash was triggered by the tour to demonstrate DeadView mode."
+  end
+
+  attr :counter, :integer
+
+  defp interactive_demo_section(assigns) do
+    ~H"""
+    <div class="card shadow-sm my-6">
+      <div class="card-body">
+        <h3 class="card-title text-base">
+          <.icon name="hero-beaker" class="size-5 text-primary" /> Interactive Demo
+        </h3>
+        <p class="text-sm text-base-content/70">
+          Use the counter to create some state, then crash the process with "Boom!" to see DeadView mode in action.
+        </p>
+        <div class="flex items-center gap-4 mt-3">
+          <div class="badge badge-lg badge-outline font-mono">
+            counter: {@counter}
+          </div>
+          <button id="increment-button" phx-click="increment" class="btn btn-sm btn-soft">
+            <.icon name="hero-plus" class="size-4" /> Increment
+          </button>
+          <button id="boom-button" phx-update="ignore" phx-click="boom" class="btn btn-sm btn-error">
+            <.icon name="hero-fire" class="size-4" /> Boom!
+          </button>
+        </div>
+      </div>
+    </div>
+    """
   end
 end
