@@ -22,6 +22,7 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
 
   attr :step, :map, required: true
   attr :completed, :boolean, required: true
+  attr :disabled, :boolean, default: false
 
   slot :button
   slot :inner_block
@@ -32,7 +33,8 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
       id={"tour-step-#{@step.id}"}
       class={[
         "card bg-base-200 shadow-sm transition-all duration-200",
-        if(@completed, do: "ring-2 ring-success")
+        if(@completed, do: "ring-2 ring-success"),
+        if(@disabled, do: "opacity-40")
       ]}
     >
       <div class="card-body">
@@ -60,7 +62,11 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
           <button
             :if={@button == []}
             id={"tour-btn-#{@step.id}"}
-            phx-click={tour_action(@step) |> JS.push("activate_step", value: %{step: @step.id})}
+            disabled={@disabled}
+            phx-click={
+              if not @disabled,
+                do: tour_action(@step) |> JS.push("activate_step", value: %{step: @step.id})
+            }
             class={[
               "btn btn-sm",
               "btn-soft"

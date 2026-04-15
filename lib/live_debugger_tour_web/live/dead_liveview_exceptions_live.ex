@@ -139,6 +139,7 @@ defmodule LiveDebuggerTourWeb.Live.DeadLiveviewExceptionsLive do
           :for={step <- @tour_steps |> Enum.drop(2)}
           step={step}
           completed={MapSet.member?(@completed_steps, step.id)}
+          disabled={not MapSet.member?(@completed_steps, 2)}
         />
       </div>
 
