@@ -119,21 +119,7 @@ defmodule LiveDebuggerTourWeb.Live.DeadLiveviewExceptionsLive do
           completed={MapSet.member?(@completed_steps, 2)}
         >
           <:button :let={step}>
-            <button
-              id="tour-btn-2"
-              phx-click={
-                if(step.completed,
-                  do: JS.push("deactivate_step", value: %{step: step.id}),
-                  else: JS.push("activate_step", value: %{step: step.id})
-                )
-              }
-              class="btn btn-sm btn-soft"
-            >
-              <.icon name="hero-viewfinder-circle" class="size-4" /> {if(step.completed,
-                do: "Hide",
-                else: "Show"
-              )} demo
-            </button>
+            <.show_hide_demo_button step={step} />
           </:button>
           <.interactive_demo_section :if={step.completed} counter={@counter} />
         </TourComponents.tour_step>
@@ -193,6 +179,28 @@ defmodule LiveDebuggerTourWeb.Live.DeadLiveviewExceptionsLive do
         </div>
       </div>
     </div>
+    """
+  end
+
+  attr :step, :map
+
+  defp show_hide_demo_button(assigns) do
+    ~H"""
+    <button
+      id="tour-btn-2"
+      phx-click={
+        if(@step.completed,
+          do: JS.push("deactivate_step", value: %{step: @step.id}),
+          else: JS.push("activate_step", value: %{step: @step.id})
+        )
+      }
+      class="btn btn-sm btn-soft"
+    >
+      <.icon name="hero-viewfinder-circle" class="size-4" /> {if(@step.completed,
+        do: "Hide",
+        else: "Show"
+      )} demo
+    </button>
     """
   end
 end

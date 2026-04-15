@@ -113,9 +113,11 @@ defmodule LiveDebuggerTour.Page do
         "deactivate_step" -> MapSet.delete(socket.assigns.completed_steps, step_id)
       end
 
+    current_step = if event == "activate_step", do: step_id, else: nil
+
     {:halt,
      socket
-     |> Phoenix.Component.assign(:current_step, step_id)
+     |> Phoenix.Component.assign(:current_step, current_step)
      |> Phoenix.LiveView.push_patch(
        to: build_path(socket.assigns.page_path, completed),
        replace: true

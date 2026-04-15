@@ -28,6 +28,9 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
   slot :inner_block
 
   def tour_step(assigns) do
+    assigns =
+      assign(assigns, :step_with_meta, Map.put(assigns.step, :completed, assigns.completed))
+
     ~H"""
     <div
       id={"tour-step-#{@step.id}"}
@@ -74,9 +77,9 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
           >
             <.icon name="hero-viewfinder-circle" class="size-4" /> Spotlight
           </button>
-          {render_slot(@button, @step |> Map.put(:completed, @completed))}
+          {render_slot(@button, @step_with_meta)}
         </div>
-        {render_slot(@inner_block, @step |> Map.put(:completed, @completed))}
+        {render_slot(@inner_block, @step_with_meta)}
       </div>
     </div>
     """
