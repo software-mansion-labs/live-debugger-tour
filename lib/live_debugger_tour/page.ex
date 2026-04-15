@@ -72,7 +72,9 @@ defmodule LiveDebuggerTour.Page do
   end
 
   def tour_page_assigns(socket, tour_steps, meta, opts \\ []) do
-    if Phoenix.LiveView.connected?(socket) do
+    skip_redirect = Keyword.get(opts, :skip_redirect, false)
+
+    if Phoenix.LiveView.connected?(socket) and not skip_redirect do
       url =
         Keyword.get_lazy(opts, :redirect_url, fn ->
           LiveDebugger.App.Web.Helpers.Routes.debugger_node_inspector(self())
@@ -124,10 +126,10 @@ defmodule LiveDebuggerTour.Page do
   end
 
   # Parses the `completed` query param into a MapSet of step IDs.
-  defp parse_completed(nil), do: MapSet.new()
-  defp parse_completed(""), do: MapSet.new()
+  def parse_completed(nil), do: MapSet.new()
+  def parse_completed(""), do: MapSet.new()
 
-  defp parse_completed(str) when is_binary(str) do
+  def parse_completed(str) when is_binary(str) do
     str
     |> String.split(",")
     |> Enum.flat_map(fn s ->
