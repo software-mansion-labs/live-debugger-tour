@@ -33,7 +33,7 @@ defmodule LiveDebuggerTourWeb.Live.AssignsLive do
       id: 3,
       title: "Search Bar",
       description:
-        "Large maps and structs are collapsed by default for readability. The search bar automatically finds and expands matching keys. Try searching for the word 'message' to see how it opens up.",
+        "Large maps and structs are collapsed by default for readability. The search bar automatically finds and expands matching keys. Try searching for the word \"<b>temporary</b>\" to see how it opens up.",
       target: :assigns_search_bar,
       action: {:highlight, [dismiss: "click-anywhere"]},
       icon: "hero-magnifying-glass"
