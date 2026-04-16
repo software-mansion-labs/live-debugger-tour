@@ -63,7 +63,6 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
             >
               {@step.code_snippet}
             </code>
-            <.counter :if={@step[:has_counter]} val={Map.get(@step, :counter_value, 0)} />
           </div>
           <button
             :if={@button == []}
@@ -249,25 +248,6 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
         class="btn btn-soft btn-sm"
       >
         Reload LiveDebugger
-      </button>
-    </div>
-    """
-  end
-
-  attr :val, :integer, required: true
-
-  defp counter(assigns) do
-    ~H"""
-    <div class="flex items-center gap-4 mt-3 p-3 bg-base-300/50 rounded-lg border border-base-300 w-max">
-      <div class="flex flex-col">
-        <span class="text-xs text-base-content/70 font-semibold uppercase">Counter</span>
-        <span class="text-xl font-mono font-bold leading-none">{@val}</span>
-      </div>
-      <button
-        phx-click="increment"
-        class="btn btn-primary btn-sm"
-      >
-        <.icon name="hero-plus" class="size-4" /> Increment
       </button>
     </div>
     """
