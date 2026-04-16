@@ -36,7 +36,7 @@ defmodule LiveDebuggerTourWeb.Live.DeadLiveviewExceptionsLive do
       title: "Observe DeadView mode",
       description:
         "The navbar now shows a pink \"Disconnected\" badge instead of the green one. " <>
-          "This is DeadView mode — the debugger detected that the process died and is showing its last known state. " <>
+          "This is DeadView mode - the debugger detected that the process died and is showing its last known state. " <>
           "All assigns and component data are still inspectable.",
       target: :navbar_connected,
       action: {:spotlight, [dismiss: "click-anywhere"]},
@@ -101,7 +101,7 @@ defmodule LiveDebuggerTourWeb.Live.DeadLiveviewExceptionsLive do
           <p class="font-semibold">What is DeadView mode?</p>
           <p class="text-sm">
             When a LiveView process crashes, the debugger doesn't lose track of it.
-            Instead, it enters DeadView mode — preserving the last known state so you can
+            Instead, it enters DeadView mode - preserving the last known state so you can
             inspect assigns, components, and traces even after the process is gone.
             A "Continue" button helps you find the successor process.
           </p>
