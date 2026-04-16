@@ -29,24 +29,6 @@ defmodule LiveDebuggerTourWeb.Live.CallbackTracesLive do
     },
     %{
       id: 2,
-      title: "Start, Stop and Refresh",
-      description:
-        "Control the flow of traces. Started streams traces live as you interact with the app. Try stopping it - this freezes the view, allowing you to apply filters and manually load the newest traces.",
-      target: :callback_traces_toggle_tracing,
-      action: {:spotlight, [dismiss: "click-target"]},
-      icon: "hero-play-pause"
-    },
-    %{
-      id: 3,
-      title: "Filtering Traces",
-      description:
-        "Find exactly what you need. Once tracing is stopped, use filters to isolate specific callbacks. You can also set Execution Time limits to easily spot performance bottlenecks.",
-      target: :callback_traces_filters_button,
-      action: {:spotlight, [dismiss: "click-anywhere"]},
-      icon: "hero-funnel"
-    },
-    %{
-      id: 4,
       title: "Trace Information",
       description:
         "Analyze the details. Each trace displays the callback arity, argument preview, and execution time. Try clicking the \"Slow Increment\" button below to simulate a heavy operation, and observe how the trace execution time is highlighted in red.",
@@ -60,6 +42,24 @@ defmodule LiveDebuggerTourWeb.Live.CallbackTracesLive do
       },
       action: {:spotlight, [dismiss: "click-anywhere"]},
       icon: "hero-document-magnifying-glass"
+    },
+    %{
+      id: 3,
+      title: "Start, Stop and Refresh",
+      description:
+        "Control the flow of traces. Started streams traces live as you interact with the app. Try stopping it - this freezes the view, allowing you to apply filters and manually load the newest traces.",
+      target: :callback_traces_toggle_tracing,
+      action: {:spotlight, [dismiss: "click-target"]},
+      icon: "hero-play-pause"
+    },
+    %{
+      id: 4,
+      title: "Filtering Traces",
+      description:
+        "Find exactly what you need. Once tracing is stopped, use filters to isolate specific callbacks. You can also set Execution Time limits to easily spot performance bottlenecks.",
+      target: :callback_traces_filters_button,
+      action: {:spotlight, [dismiss: "click-anywhere"]},
+      icon: "hero-funnel"
     },
     %{
       id: 5,
