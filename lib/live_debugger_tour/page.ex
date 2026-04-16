@@ -100,39 +100,7 @@ defmodule LiveDebuggerTour.Page do
     |> Phoenix.LiveView.attach_hook(:page_events, :handle_event, &handle_event_hook/3)
   end
 
-  defp handle_params_hook(params, _uri, socket) do
-    completed_steps = parse_completed(params["completed"])
-    {:halt, Phoenix.Component.assign(socket, :completed_steps, completed_steps)}
-  end
-
-  defp handle_event_hook(event, %{"step" => step_id}, socket)
-       when event in ["activate_step", "deactivate_step"] do
-    completed =
-      case event do
-        "activate_step" -> MapSet.put(socket.assigns.completed_steps, step_id)
-        "deactivate_step" -> MapSet.delete(socket.assigns.completed_steps, step_id)
-      end
-
-    current_step = if event == "activate_step", do: step_id, else: nil
-
-    {:halt,
-     socket
-     |> Phoenix.Component.assign(:current_step, current_step)
-     |> Phoenix.LiveView.push_patch(
-       to: build_path(socket.assigns.page_path, completed),
-       replace: true
-     )}
-  end
-
-  defp handle_event_hook("clear_tour", _params, socket) do
-    {:halt, Phoenix.Component.assign(socket, :current_step, nil)}
-  end
-
-  defp handle_event_hook(_event, _params, socket) do
-    {:cont, socket}
-  end
-
-  # Parses the `completed` query param into a MapSet of step IDs.
+  @doc "Parses the `completed` query param into a MapSet of step IDs."
   def parse_completed(nil), do: MapSet.new()
   def parse_completed(""), do: MapSet.new()
 
@@ -146,6 +114,40 @@ defmodule LiveDebuggerTour.Page do
       end
     end)
     |> MapSet.new()
+  end
+
+  defp handle_params_hook(params, _uri, socket) do
+    completed_steps = parse_completed(params["completed"])
+    {:halt, Phoenix.Component.assign(socket, :completed_steps, completed_steps)}
+  end
+
+  defp handle_event_hook("activate_step", %{"step" => step_id}, socket) do
+    completed = MapSet.put(socket.assigns.completed_steps, step_id)
+
+    {:halt, assign_completed(socket, step_id, completed)}
+  end
+
+  defp handle_event_hook("deactivate_step", %{"step" => step_id}, socket) do
+    completed = MapSet.delete(socket.assigns.completed_steps, step_id)
+
+    {:halt, assign_completed(socket, nil, completed)}
+  end
+
+  defp handle_event_hook("clear_tour", _params, socket) do
+    {:halt, Phoenix.Component.assign(socket, :current_step, nil)}
+  end
+
+  defp handle_event_hook(_event, _params, socket) do
+    {:cont, socket}
+  end
+
+  defp assign_completed(socket, current_step, completed) do
+    socket
+    |> Phoenix.Component.assign(:current_step, current_step)
+    |> Phoenix.LiveView.push_patch(
+      to: build_path(socket.assigns.page_path, completed),
+      replace: true
+    )
   end
 
   # Builds a page path with completed steps encoded as a query param.

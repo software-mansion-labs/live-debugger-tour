@@ -119,7 +119,7 @@ defmodule LiveDebuggerTourWeb.Live.DeadLiveviewExceptionsLive do
           completed={MapSet.member?(@completed_steps, 2)}
         >
           <:button :let={step}>
-            <.show_hide_demo_button step={step} />
+            <.toggle_demo_button step={step} />
           </:button>
           <.interactive_demo_section :if={step.completed} counter={@counter} />
         </TourComponents.tour_step>
@@ -184,7 +184,7 @@ defmodule LiveDebuggerTourWeb.Live.DeadLiveviewExceptionsLive do
 
   attr :step, :map
 
-  defp show_hide_demo_button(assigns) do
+  defp toggle_demo_button(assigns) do
     ~H"""
     <button
       id="tour-btn-2"
