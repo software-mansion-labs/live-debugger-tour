@@ -83,8 +83,7 @@ defmodule LiveDebuggerTourWeb.Live.AssignsLive do
       <TourComponents.header
         number={@page_number}
         name={@page_title}
-        description="Open the LiveDebugger panel alongside this page and follow the guided steps
-          below. Each button will spotlight a part of the debugger UI."
+        description="Learn how to inspect and monitor your LiveView's state. Open the debugger panel and follow the steps below to see how assigns update in real-time when you interact with the page."
       />
       <TourComponents.progress_bar tour_steps={@tour_steps} completed_steps={@completed_steps} />
 

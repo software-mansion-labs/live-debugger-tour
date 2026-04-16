@@ -63,7 +63,7 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
             >
               {@step.code_snippet}
             </code>
-            <.counter :if={@step[:has_counter]} val={Map.get(@step, :counter_value, 0)}/>
+            <.counter :if={@step[:has_counter]} val={Map.get(@step, :counter_value, 0)} />
           </div>
           <button
             :if={@button == []}
@@ -82,7 +82,7 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
                 <.icon name="hero-viewfinder-circle" class="size-4" /> Spotlight
               <% {:client_spotlight, _opts} -> %>
                 <.icon name="hero-viewfinder-circle" class="size-4" /> Spotlight
-            <% end %>  
+            <% end %>
           </button>
           {render_slot(@button, @step_with_meta)}
         </div>
