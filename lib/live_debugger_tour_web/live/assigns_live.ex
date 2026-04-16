@@ -44,7 +44,7 @@ defmodule LiveDebuggerTourWeb.Live.AssignsLive do
       description:
         "Focus on what matters most. Pinning keeps specific variables at the top of your view. Try hovering over an assign in the debugger and clicking the pin icon next to it.",
       target: :assigns_pinned,
-      action: {:spotlight, [dismiss: "click-target"]},
+      action: {:spotlight, [dismiss: "click-anywhere"]},
       icon: "hero-map-pin"
     },
     %{
