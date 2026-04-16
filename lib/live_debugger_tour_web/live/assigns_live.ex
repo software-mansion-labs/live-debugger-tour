@@ -4,7 +4,8 @@ defmodule LiveDebuggerTourWeb.Live.AssignsLive do
   use LiveDebuggerTour.Page,
     number: 2,
     title: "Assigns",
-    description: "Explore LiveView state."
+    description:
+      "Track your socket assigns in real-time. Master searching, pinning, and exploring state history to understand your component's lifecycle."
 
   alias LiveDebugger.App.Web.Helpers.Routes, as: RoutesHelper
   alias LiveDebuggerTourWeb.Components.TourComponents
