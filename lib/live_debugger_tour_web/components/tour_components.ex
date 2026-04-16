@@ -22,14 +22,22 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
 
   attr :step, :map, required: true
   attr :completed, :boolean, required: true
+  attr :disabled, :boolean, default: false
+
+  slot :button
+  slot :inner_block
 
   def tour_step(assigns) do
+    assigns =
+      assign(assigns, :step_with_meta, Map.put(assigns.step, :completed, assigns.completed))
+
     ~H"""
     <div
       id={"tour-step-#{@step.id}"}
       class={[
         "card bg-base-200 shadow-sm transition-all duration-200",
-        if(@completed, do: "ring-2 ring-success")
+        if(@completed, do: "ring-2 ring-success"),
+        if(@disabled, do: "opacity-40")
       ]}
     >
       <div class="card-body">
@@ -46,7 +54,9 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
           </div>
           <div class="flex-1">
             <h3 class="card-title text-base">{@step.title}</h3>
-            <p class="text-sm text-base-content/70">{@step.description}</p>
+            <p class="text-sm text-base-content/70">
+              {Phoenix.HTML.raw(@step.description)}
+            </p>
             <code
               :if={@step[:code_snippet]}
               class="block mt-2 px-3 py-2 text-xs bg-base-300 rounded-lg font-mono select-all"
@@ -55,16 +65,20 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
             </code>
           </div>
           <button
+            :if={@button == []}
             id={"tour-btn-#{@step.id}"}
-            phx-click={tour_action(@step) |> JS.push("activate_step", value: %{step: @step.id})}
-            class={[
-              "btn btn-sm",
-              "btn-soft"
-            ]}
+            disabled={@disabled}
+            phx-click={
+              if not @disabled,
+                do: tour_action(@step) |> JS.push("activate_step", value: %{step: @step.id})
+            }
+            class="btn btn-sm btn-soft"
           >
             <.icon name="hero-viewfinder-circle" class="size-4" /> Spotlight
           </button>
+          {render_slot(@button, @step_with_meta)}
         </div>
+        {render_slot(@inner_block, @step_with_meta)}
       </div>
     </div>
     """

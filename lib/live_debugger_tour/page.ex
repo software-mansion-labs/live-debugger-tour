@@ -72,7 +72,9 @@ defmodule LiveDebuggerTour.Page do
   end
 
   def tour_page_assigns(socket, tour_steps, meta, opts \\ []) do
-    if Phoenix.LiveView.connected?(socket) do
+    skip_redirect = Keyword.get(opts, :skip_redirect, false)
+
+    if Phoenix.LiveView.connected?(socket) and not skip_redirect do
       url =
         Keyword.get_lazy(opts, :redirect_url, fn ->
           LiveDebugger.App.Web.Helpers.Routes.debugger_node_inspector(self())
@@ -98,6 +100,22 @@ defmodule LiveDebuggerTour.Page do
     |> Phoenix.LiveView.attach_hook(:page_events, :handle_event, &handle_event_hook/3)
   end
 
+  @doc "Parses the `completed` query param into a MapSet of step IDs."
+  def parse_completed(nil), do: MapSet.new()
+  def parse_completed(""), do: MapSet.new()
+
+  def parse_completed(str) when is_binary(str) do
+    str
+    |> String.split(",")
+    |> Enum.flat_map(fn s ->
+      case Integer.parse(s) do
+        {n, ""} -> [n]
+        _ -> []
+      end
+    end)
+    |> MapSet.new()
+  end
+
   defp handle_params_hook(params, _uri, socket) do
     completed_steps = parse_completed(params["completed"])
     {:halt, Phoenix.Component.assign(socket, :completed_steps, completed_steps)}
@@ -106,13 +124,13 @@ defmodule LiveDebuggerTour.Page do
   defp handle_event_hook("activate_step", %{"step" => step_id}, socket) do
     completed = MapSet.put(socket.assigns.completed_steps, step_id)
 
-    {:halt,
-     socket
-     |> Phoenix.Component.assign(:current_step, step_id)
-     |> Phoenix.LiveView.push_patch(
-       to: build_path(socket.assigns.page_path, completed),
-       replace: true
-     )}
+    {:halt, assign_completed(socket, step_id, completed)}
+  end
+
+  defp handle_event_hook("deactivate_step", %{"step" => step_id}, socket) do
+    completed = MapSet.delete(socket.assigns.completed_steps, step_id)
+
+    {:halt, assign_completed(socket, nil, completed)}
   end
 
   defp handle_event_hook("clear_tour", _params, socket) do
@@ -123,20 +141,13 @@ defmodule LiveDebuggerTour.Page do
     {:cont, socket}
   end
 
-  # Parses the `completed` query param into a MapSet of step IDs.
-  defp parse_completed(nil), do: MapSet.new()
-  defp parse_completed(""), do: MapSet.new()
-
-  defp parse_completed(str) when is_binary(str) do
-    str
-    |> String.split(",")
-    |> Enum.flat_map(fn s ->
-      case Integer.parse(s) do
-        {n, ""} -> [n]
-        _ -> []
-      end
-    end)
-    |> MapSet.new()
+  defp assign_completed(socket, current_step, completed) do
+    socket
+    |> Phoenix.Component.assign(:current_step, current_step)
+    |> Phoenix.LiveView.push_patch(
+      to: build_path(socket.assigns.page_path, completed),
+      replace: true
+    )
   end
 
   # Builds a page path with completed steps encoded as a query param.

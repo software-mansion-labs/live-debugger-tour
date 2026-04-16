@@ -15,7 +15,7 @@ defmodule LiveDebuggerTourWeb.Live.StartDebuggingLive do
       id: 1,
       title: "Open LiveDebugger",
       description:
-        "Look for the floating bug icon button in the bottom-right corner of this page. Click it to open the LiveDebugger panel in a new tab. This button is injected automatically when LiveDebugger is added as a dependency.",
+        "Look for the floating bug icon button in the <span class=\"text-success font-bold\">bottom-right corner</span> of this page. Click it to open the LiveDebugger panel in a new tab. This button is injected automatically when LiveDebugger is added as a dependency.",
       target: "live-debugger-debug-button",
       action: {:client_spotlight, []},
       icon: "hero-bug-ant"
@@ -73,6 +73,7 @@ defmodule LiveDebuggerTourWeb.Live.StartDebuggingLive do
           :for={step <- @tour_steps}
           step={step}
           completed={MapSet.member?(@completed_steps, step.id)}
+          disabled={step.id != 1 and not MapSet.member?(@completed_steps, 1)}
         />
       </div>
 
