@@ -173,7 +173,7 @@ defmodule LiveDebuggerTourWeb.Live.DeadLiveviewExceptionsLive do
           <button id="increment-button" phx-click="increment" class="btn btn-sm btn-soft">
             <.icon name="hero-plus" class="size-4" /> Increment
           </button>
-          <button id="boom-button" phx-update="ignore" phx-click="boom" class="btn btn-sm btn-error">
+          <button id="boom-button" phx-click="boom" class="btn btn-sm btn-error">
             <.icon name="hero-fire" class="size-4" /> Boom!
           </button>
         </div>

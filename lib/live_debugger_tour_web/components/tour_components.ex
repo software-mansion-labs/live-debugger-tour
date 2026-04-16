@@ -54,7 +54,9 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
           </div>
           <div class="flex-1">
             <h3 class="card-title text-base">{@step.title}</h3>
-            <p class="text-sm text-base-content/70">{@step.description}</p>
+            <p class="text-sm text-base-content/70">
+              {Phoenix.HTML.raw(@step.description)}
+            </p>
             <code
               :if={@step[:code_snippet]}
               class="block mt-2 px-3 py-2 text-xs bg-base-300 rounded-lg font-mono select-all"
@@ -70,10 +72,7 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
               if not @disabled,
                 do: tour_action(@step) |> JS.push("activate_step", value: %{step: @step.id})
             }
-            class={[
-              "btn btn-sm",
-              "btn-soft"
-            ]}
+            class="btn btn-sm btn-soft"
           >
             <.icon name="hero-viewfinder-circle" class="size-4" /> Spotlight
           </button>
