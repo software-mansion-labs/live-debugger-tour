@@ -106,7 +106,8 @@ defmodule LiveDebuggerTour.PageDiscovery do
         |> Enum.at(index + 1)
         |> then(fn
           nil -> nil
-          page -> page.path
+          %{coming_soon: true} -> nil
+          %{path: path} -> path
         end)
       end
 

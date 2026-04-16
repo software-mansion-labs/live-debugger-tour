@@ -90,6 +90,7 @@ defmodule LiveDebuggerTour.Page do
       page_title: meta.title,
       page_number: meta.number,
       page_path: meta.path,
+      coming_soon: Map.get(meta, :coming_soon, false),
       current_step: nil,
       completed_steps: MapSet.new(),
       tour_steps: tour_steps,
