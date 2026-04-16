@@ -25,8 +25,7 @@ defmodule LiveDebuggerTourWeb.Live.AssignsLive do
       description:
         "Spot bugs faster by seeing exactly what changed. The status dot signals when assigns are updating and stays solid green when they are up to date. Try clicking the Increment button below - the updated counter assign will be immediately highlighted in the debugger.",
       target: "#assigns-title-section",
-      has_counter: true,
-      counter_value: 0,
+      has_demo: true,
       action: {:highlight, [dismiss: "click-anywhere", clear: false]},
       icon: "hero-sparkles"
     },
@@ -54,8 +53,7 @@ defmodule LiveDebuggerTourWeb.Live.AssignsLive do
       description:
         "Track state changes over time to see exactly how consecutive actions affected your component. Click the counter a few times, then check the history to see the sequence of mutations step by step.",
       target: :assigns_history_button,
-      has_counter: true,
-      counter_value: 0,
+      has_demo: true,
       action: {:spotlight, [dismiss: "click-anywhere"]},
       icon: "hero-clock"
     },
@@ -90,9 +88,11 @@ defmodule LiveDebuggerTourWeb.Live.AssignsLive do
       <div id="tour-cards" class="space-y-4">
         <TourComponents.tour_step
           :for={step <- @tour_steps}
-          step={if step[:has_counter], do: Map.put(step, :counter_value, @counter), else: step}
+          step={step}
           completed={MapSet.member?(@completed_steps, step.id)}
-        />
+        >
+          <.interactive_demo_section :if={step[:has_demo]} counter={@counter} />
+        </TourComponents.tour_step>
       </div>
 
       <TourComponents.clear_spotlight_button :if={@current_step != nil} />
@@ -110,5 +110,30 @@ defmodule LiveDebuggerTourWeb.Live.AssignsLive do
   @impl true
   def handle_event("increment", _params, socket) do
     {:noreply, update(socket, :counter, &(&1 + 1))}
+  end
+
+  attr :counter, :integer, required: true
+
+  defp interactive_demo_section(assigns) do
+    ~H"""
+    <div class="card shadow-sm mt-4 border border-base-300">
+      <div class="card-body p-4">
+        <h3 class="card-title text-base">
+          <.icon name="hero-beaker" class="size-5 text-primary" /> Interactive Demo
+        </h3>
+        <p class="text-sm text-base-content/70">
+          Use the counter below to change the state and observe how LiveDebugger tracks these mutations in real-time.
+        </p>
+        <div class="flex items-center gap-4 mt-3">
+          <div class="badge badge-lg badge-outline font-mono">
+            counter: {@counter}
+          </div>
+          <button phx-click="increment" class="btn btn-sm btn-soft">
+            <.icon name="hero-plus" class="size-4" /> Increment
+          </button>
+        </div>
+      </div>
+    </div>
+    """
   end
 end
