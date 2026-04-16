@@ -4,7 +4,8 @@ defmodule LiveDebuggerTourWeb.Live.CallbackTracesLive do
   use LiveDebuggerTour.Page,
     number: 3,
     title: "Callback Traces",
-    description: "Explore LiveView lifecycle with recorded traces."
+    description:
+      "Monitor function calls in real-time. Learn how to freeze traces, apply filters, and pinpoint performance bottlenecks in your LiveView lifecycle."
 
   alias LiveDebugger.App.Web.Helpers.Routes, as: RoutesHelper
   alias LiveDebuggerTourWeb.Components.TourComponents
@@ -14,8 +15,15 @@ defmodule LiveDebuggerTourWeb.Live.CallbackTracesLive do
       id: 1,
       title: "Callback Traces Overview",
       description:
-        "This feature allows you to see exactly how lifecycle functions are being called in your application. You can monitor a specific node here in the Node Inspector, or track all nodes at once using Global Traces.",
+        "This feature allows you to see exactly how lifecycle functions are being called. Try clicking the Increment button in the demo below and watch as a new \"handle_event\" trace instantly appears in the debugger.",
       target: :callback_traces_section,
+      demo: %{
+        event: "increment",
+        label: "Increment",
+        is_slow: false,
+        description:
+          "Click the button below to trigger a <code>handle_event</code> callback and see it immediately appear in the debugger's traces list."
+      },
       action: {:spotlight, [dismiss: "click-anywhere"]},
       icon: "hero-queue-list"
     },
@@ -25,7 +33,7 @@ defmodule LiveDebuggerTourWeb.Live.CallbackTracesLive do
       description:
         "Control the flow of traces. Started streams traces live as you interact with the app. Try stopping it - this freezes the view, allowing you to apply filters and manually load the newest traces.",
       target: :callback_traces_toggle_tracing,
-      action: {:spotlight, [dismiss: "click-anywhere"]},
+      action: {:spotlight, [dismiss: "click-target"]},
       icon: "hero-play-pause"
     },
     %{
@@ -41,9 +49,16 @@ defmodule LiveDebuggerTourWeb.Live.CallbackTracesLive do
       id: 4,
       title: "Trace Information",
       description:
-        "Analyze the details. Each trace displays the callback arity, argument preview, and execution time. Try clicking a trace to expand it, copy the arguments, open in edior or view them in fullscreen.",
+        "Analyze the details. Each trace displays the callback arity, argument preview, and execution time. Try clicking the \"Slow Increment\" button below to simulate a heavy operation, and observe how the trace execution time is highlighted in red.",
       target: :callback_traces_first_trace,
-      action: {:spotlight, [dismiss: "click-target"]},
+      demo: %{
+        event: "slow_increment",
+        label: "Slow Increment",
+        is_slow: true,
+        description:
+          "Clicking the button below will deliberately pause the process for over 1 second. Watch how the tracer highlights the execution time to help you spot bottlenecks."
+      },
+      action: {:spotlight, [dismiss: "click-anywhere"]},
       icon: "hero-document-magnifying-glass"
     },
     %{
@@ -65,7 +80,10 @@ defmodule LiveDebuggerTourWeb.Live.CallbackTracesLive do
       |> LiveDebugger.Tour.redirect()
     end
 
-    {:ok, tour_page_assigns(socket, @tour_steps)}
+    {:ok,
+     socket
+     |> assign(counter: 0)
+     |> tour_page_assigns(@tour_steps)}
   end
 
   @impl true
@@ -74,8 +92,8 @@ defmodule LiveDebuggerTourWeb.Live.CallbackTracesLive do
     <Layouts.app flash={@flash}>
       <TourComponents.header
         number={@page_number}
-        name="Callback Traces"
-        description="Learn how to monitor function calls, inspect arguments, and find performance bottlenecks in your LiveView app. Open the LiveDebugger panel and follow the steps below."
+        name={@page_title}
+        description="Discover how to track your LiveView's lifecycle events. Open the debugger panel and follow the steps below to monitor callbacks in real-time, pause the stream, apply filters, and inspect massive payloads."
       />
       <TourComponents.progress_bar tour_steps={@tour_steps} completed_steps={@completed_steps} />
 
@@ -84,7 +102,10 @@ defmodule LiveDebuggerTourWeb.Live.CallbackTracesLive do
           :for={step <- @tour_steps}
           step={step}
           completed={MapSet.member?(@completed_steps, step.id)}
-        />
+          disabled={step.id == 3 and not MapSet.member?(@completed_steps, 2)}
+        >
+          <.interactive_demo_section :if={step[:demo]} demo={step.demo} counter={@counter} />
+        </TourComponents.tour_step>
       </div>
 
       <TourComponents.clear_spotlight_button :if={@current_step != nil} />
@@ -96,6 +117,54 @@ defmodule LiveDebuggerTourWeb.Live.CallbackTracesLive do
 
       <TourComponents.navigation prev_page={@prev_page} next_page={@next_page} />
     </Layouts.app>
+    """
+  end
+
+  @impl true
+  def handle_event("increment", _params, socket) do
+    {:noreply, update(socket, :counter, &(&1 + 1))}
+  end
+
+  @impl true
+  def handle_event("slow_increment", _params, socket) do
+    Process.sleep(1200)
+    {:noreply, update(socket, :counter, &(&1 + 1))}
+  end
+
+  attr :counter, :integer, required: true
+  attr :demo, :map, required: true
+
+  defp interactive_demo_section(assigns) do
+    ~H"""
+    <div class="card shadow-sm mt-4 border border-base-300">
+      <div class="card-body p-4">
+        <h3 class="card-title text-base">
+          <.icon
+            name={if @demo.is_slow, do: "hero-clock", else: "hero-beaker"}
+            class="size-5 text-primary"
+          />
+          {if @demo.is_slow, do: "Slow Execution Demo", else: "Interactive Demo"}
+        </h3>
+
+        <p class="text-sm text-base-content/70">
+          {Phoenix.HTML.raw(@demo.description)}
+        </p>
+
+        <div class="flex items-center gap-4 mt-3">
+          <div class="badge badge-lg badge-outline font-mono">
+            counter: {@counter}
+          </div>
+          <button
+            phx-click={@demo.event}
+            phx-disable-with={if @demo.is_slow, do: "Processing...", else: nil}
+            class="btn btn-sm btn-soft"
+          >
+            <.icon name={if @demo.is_slow, do: "hero-play", else: "hero-plus"} class="size-4" />
+            {@demo.label}
+          </button>
+        </div>
+      </div>
+    </div>
     """
   end
 end
