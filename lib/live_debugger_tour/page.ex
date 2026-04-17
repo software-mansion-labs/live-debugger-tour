@@ -122,10 +122,25 @@ defmodule LiveDebuggerTour.Page do
     {:halt, Phoenix.Component.assign(socket, :completed_steps, completed_steps)}
   end
 
-  defp handle_event_hook("activate_step", %{"step" => step_id}, socket) do
+  defp handle_event_hook(
+         "activate_step",
+         %{"step" => step_id} = params,
+         socket
+       ) do
     completed = MapSet.put(socket.assigns.completed_steps, step_id)
 
-    {:halt, assign_completed(socket, step_id, completed)}
+    socket =
+      params["action"]
+      |> case do
+        "client_spotlight" ->
+          Phoenix.LiveView.push_event(socket, "tour:client-spotlight", %{target: params["target"]})
+
+        _ ->
+          socket
+      end
+      |> assign_completed(step_id, completed)
+
+    {:halt, socket}
   end
 
   defp handle_event_hook("deactivate_step", %{"step" => step_id}, socket) do

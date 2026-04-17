@@ -68,10 +68,7 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
             :if={@button == []}
             id={"tour-btn-#{@step.id}"}
             disabled={@disabled}
-            phx-click={
-              if not @disabled,
-                do: tour_action(@step) |> JS.push("activate_step", value: %{step: @step.id})
-            }
+            phx-click={if not @disabled, do: tour_action(@step)}
             class="btn btn-sm btn-soft"
           >
             <.icon name="hero-viewfinder-circle" class="size-4" /> Spotlight
@@ -140,7 +137,6 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
           const overlay = document.createElement('div');
           overlay.id = OVERLAY_ID;
           overlay.className = 'tour-overlay';
-          overlay.addEventListener('click', (e) => e.stopPropagation());
           document.body.appendChild(overlay);
         }
       }
@@ -157,17 +153,18 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
 
           this._cleanup = () => controller.abort();
 
-          this.el.addEventListener('tour:client-spotlight', (e) => {
-            const { target } = e.detail;
+          this.handleEvent('tour:client-spotlight', (e) => {
+            const { target } = e;
             clearAll();
             createOverlay();
             const el = document.getElementById(target);
             if (el) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'center', });
               el.classList.add('tour-spotlight-target');
 
               setTimeout(() => {
                 if (!controller.signal.aborted) {
-                  el.addEventListener('click', handler, {
+                  document.addEventListener('click', handler, {
                     once: true,
                     signal: controller.signal,
                   });
@@ -246,18 +243,21 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
     """
   end
 
-  defp tour_action(%{action: {:client_spotlight, []}, target: target}) do
-    JS.dispatch("tour:client-spotlight",
-      to: "#client-spotlight-hook",
-      detail: %{target: target}
-    )
+  defp tour_action(%{id: id, action: {:client_spotlight, []}, target: target}) do
+    JS.push("activate_step", value: %{step: id, action: :client_spotlight, target: target})
   end
 
-  defp tour_action(%{action: {:spotlight, opts}, target: target}),
-    do: Tour.spotlight_JS(target, opts)
+  defp tour_action(%{id: id, action: {:spotlight, opts}, target: target}) do
+    target
+    |> Tour.spotlight_JS(opts)
+    |> JS.push("activate_step", value: %{step: id})
+  end
 
-  defp tour_action(%{action: {:highlight, opts}, target: target}),
-    do: Tour.highlight_JS(target, opts)
+  defp tour_action(%{id: id, action: {:highlight, opts}, target: target}) do
+    target
+    |> Tour.highlight_JS(opts)
+    |> JS.push("activate_step", value: %{step: id})
+  end
 
   defp clear_all_spotlights do
     Tour.clear_JS()
