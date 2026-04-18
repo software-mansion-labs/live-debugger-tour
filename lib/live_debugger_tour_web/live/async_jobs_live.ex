@@ -23,7 +23,7 @@ defmodule LiveDebuggerTourWeb.Live.AsyncJobsLive do
       id: 2,
       title: "Observing Pending State",
       description:
-        "Because fast tasks vanish instantly, they can be hard to track. To properly observe a job's lifecycle and its assigned PID, let's simulate a heavy operation. Watch the debugger as the task sits in the active queue for 3 seconds.",
+        "To properly observe an async job's lifecycle and its assigned PID, let's simulate a heavy operation. Trigger the slow task below and watch the debugger.",
       target: "#async-jobs",
       demo: %{
         event: "start_slow_async",
