@@ -47,7 +47,7 @@ defmodule LiveDebuggerTourWeb.Live.CallbackTracesLive do
       id: 3,
       title: "Start, Stop and Refresh",
       description:
-        "Control the flow of traces. Started streams traces live as you interact with the app. Try stopping it - this freezes the view, allowing you to apply filters and manually load the newest traces.",
+        "Control the flow of traces. Starting it streams traces live as you interact with the app. Try stopping it - this freezes the view, allowing you to apply filters and manually load the newest traces.",
       target: :callback_traces_toggle_tracing,
       action: {:spotlight, [dismiss: "click-target"]},
       icon: "hero-play-pause"
@@ -74,12 +74,6 @@ defmodule LiveDebuggerTourWeb.Live.CallbackTracesLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    if connected?(socket) do
-      self()
-      |> RoutesHelper.debugger_node_inspector()
-      |> LiveDebugger.Tour.redirect()
-    end
-
     {:ok,
      socket
      |> assign(counter: 0)
@@ -102,7 +96,7 @@ defmodule LiveDebuggerTourWeb.Live.CallbackTracesLive do
           :for={step <- @tour_steps}
           step={step}
           completed={MapSet.member?(@completed_steps, step.id)}
-          disabled={step.id == 3 and not MapSet.member?(@completed_steps, 2)}
+          disabled={step.id == 4 and not MapSet.member?(@completed_steps, 3)}
         >
           <.interactive_demo_section :if={step[:demo]} demo={step.demo} counter={@counter} />
         </TourComponents.tour_step>
