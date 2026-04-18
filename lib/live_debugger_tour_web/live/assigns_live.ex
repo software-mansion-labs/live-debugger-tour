@@ -13,7 +13,7 @@ defmodule LiveDebuggerTourWeb.Live.AssignsLive do
   @tour_steps [
     %{
       id: 1,
-      title: "Assigns section overview",
+      title: "Section overview",
       description:
         "This section acts like a live IO.inspect/1 with context. It lets you inspect the current state of assigns for any LiveView or LiveComponent, updating immediately whenever the examined node changes.",
       target: :assigns_section,
@@ -22,7 +22,7 @@ defmodule LiveDebuggerTourWeb.Live.AssignsLive do
     },
     %{
       id: 2,
-      title: "Assigns change indicator",
+      title: "Change indicator",
       description:
         "Spot bugs faster by seeing exactly what changed. The status dot signals when assigns are updating and stays solid green when they are up to date. Try clicking the Increment button below - the updated counter assign will be immediately highlighted in the debugger.",
       target: "#assigns-title-section",
@@ -41,7 +41,7 @@ defmodule LiveDebuggerTourWeb.Live.AssignsLive do
     },
     %{
       id: 4,
-      title: "Pinned assigns",
+      title: "Pinned <br> assigns",
       description:
         "Focus on what matters most. Pinning keeps specific variables at the top of your view. Try hovering over an assign in the debugger and clicking the pin icon next to it.",
       target: :assigns_pinned,
@@ -50,7 +50,7 @@ defmodule LiveDebuggerTourWeb.Live.AssignsLive do
     },
     %{
       id: 5,
-      title: "Assigns history",
+      title: "Assigns <br> history",
       description:
         "Track state changes over time to see exactly how consecutive actions affected your component. Click the counter a few times, then check the history to see the sequence of mutations step by step.",
       target: :assigns_history_button,
@@ -70,9 +70,13 @@ defmodule LiveDebuggerTourWeb.Live.AssignsLive do
   ]
   @impl true
   def mount(_params, _session, socket) do
-    socket = assign(socket, :counter, 0)
-    socket = assign(socket, :message, ["Happy Debugging"])
-    {:ok, tour_page_assigns(socket, @tour_steps), temporary_assigns: [message: []]}
+    socket =
+      socket
+      |> assign(:counter, 0)
+      |> assign(:message, ["Happy Debugging"])
+      |> tour_page_assigns(@tour_steps)
+
+    {:ok, socket, temporary_assigns: [message: []]}
   end
 
   @impl true

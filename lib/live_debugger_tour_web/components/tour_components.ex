@@ -102,7 +102,7 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
           "step",
           if(MapSet.member?(@completed_steps, step.id), do: "step-success")
         ]}>
-          {step.title}
+          {Phoenix.HTML.raw(step.title)}
         </li>
       <% end %>
     </ul>
