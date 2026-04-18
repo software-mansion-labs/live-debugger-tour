@@ -5,7 +5,7 @@ defmodule LiveDebuggerTourWeb.Live.AsyncJobsLive do
     number: 6,
     title: "Async Jobs",
     description:
-      "Observe assign_async and start_async behavior. Learn how background tasks transition from pending states to successful completions in real-time."
+      "Monitor your LiveView background jobs in real-time. Follow assign_async and start_async tasks from the moment they spawn until they resolve."
 
   alias LiveDebuggerTourWeb.Components.TourComponents
 
