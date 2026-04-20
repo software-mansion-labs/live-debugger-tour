@@ -53,7 +53,7 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
             <% end %>
           </div>
           <div class="flex-1">
-            <h3 class="card-title text-base">{@step.title}</h3>
+            <h3 class="card-title text-base">{String.replace(@step.title, ~r/<[^>]+>/, "")}</h3>
             <p class="text-sm text-base-content/70">
               {Phoenix.HTML.raw(@step.description)}
             </p>

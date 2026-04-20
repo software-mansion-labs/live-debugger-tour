@@ -41,15 +41,24 @@ defmodule LiveDebuggerTourWeb.Live.AssignsLive do
     },
     %{
       id: 4,
+      title: "How to Pin",
+      description:
+        "To keep an eye on a specific variable, you can pin it. Hover over the <b>counter</b> assign in the debugger panel to reveal the pin icon, then click it.",
+      target: "#all-assigns_counter",
+      action: {:spotlight, [dismiss: "click-target"]},
+      icon: "hero-cursor-arrow-rays"
+    },
+    %{
+      id: 5,
       title: "Pinned <br> assigns",
       description:
-        "Focus on what matters most. Pinning keeps specific variables at the top of your view. Try hovering over an assign in the debugger and clicking the pin icon next to it.",
+        "Once pinned, assigns stay in this dedicated section at the top of your view. This is incredibly useful for tracking crucial state changes without losing them in a large list.",
       target: :assigns_pinned,
       action: {:spotlight, [dismiss: "click-anywhere"]},
       icon: "hero-map-pin"
     },
     %{
-      id: 5,
+      id: 6,
       title: "Assigns <br> history",
       description:
         "Track state changes over time to see exactly how consecutive actions affected your component. Click the counter a few times, then check the history to see the sequence of mutations step by step.",
@@ -59,7 +68,7 @@ defmodule LiveDebuggerTourWeb.Live.AssignsLive do
       icon: "hero-clock"
     },
     %{
-      id: 6,
+      id: 7,
       title: "Temporary Assigns",
       description:
         "Because temporary assigns are immediately cleared from server memory after rendering, they don't show up in the normal assigns list. This dedicated section catches them so you can still inspect them.",
@@ -68,6 +77,7 @@ defmodule LiveDebuggerTourWeb.Live.AssignsLive do
       icon: "hero-archive-box"
     }
   ]
+
   @impl true
   def mount(_params, _session, socket) do
     socket =
@@ -76,7 +86,7 @@ defmodule LiveDebuggerTourWeb.Live.AssignsLive do
       |> assign(:message, ["Happy Debugging"])
       |> tour_page_assigns(@tour_steps)
 
-    {:ok, socket, temporary_assigns: [message: []]}
+    {:ok, socket, temporary_assigns: [message: nil]}
   end
 
   @impl true
