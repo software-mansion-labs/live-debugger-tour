@@ -53,7 +53,7 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
             <% end %>
           </div>
           <div class="flex-1">
-            <h3 class="card-title text-base">{@step.title}</h3>
+            <h3 class="card-title text-base">{String.replace(@step.title, ~r/<[^>]+>/, "")}</h3>
             <p class="text-sm text-base-content/70">
               {Phoenix.HTML.raw(@step.description)}
             </p>
@@ -74,7 +74,14 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
             }
             class="btn btn-sm btn-soft"
           >
-            <.icon name="hero-viewfinder-circle" class="size-4" /> Spotlight
+            <%= case @step[:action] do %>
+              <% {:highlight, _opts} -> %>
+                <.icon name="hero-viewfinder-circle" class="size-4" /> Highlight
+              <% {:spotlight, _opts} -> %>
+                <.icon name="hero-viewfinder-circle" class="size-4" /> Spotlight
+              <% {:client_spotlight, _opts} -> %>
+                <.icon name="hero-viewfinder-circle" class="size-4" /> Spotlight
+            <% end %>
           </button>
           {render_slot(@button, @step_with_meta)}
         </div>
@@ -95,7 +102,7 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
           "step",
           if(MapSet.member?(@completed_steps, step.id), do: "step-success")
         ]}>
-          {step.title}
+          {Phoenix.HTML.raw(step.title)}
         </li>
       <% end %>
     </ul>
