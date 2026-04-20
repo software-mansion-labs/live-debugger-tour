@@ -65,7 +65,7 @@ defmodule LiveDebuggerTourWeb.Live.CallbackTracesLive do
       id: 5,
       title: "Search & Highlight",
       description:
-        "The search bar lets you query arguments directly. It automatically expands hidden structs and highlights every matching phrase, making it easy to navigate massive payloads.",
+        "The search bar lets you query arguments directly. It automatically expands hidden structs and highlights every matching phrase, making it easy to navigate massive payloads. Try searching for the word \"<b>traces</b>\" to see how it works.",
       target: :callback_traces_search_bar,
       action: {:highlight, [dismiss: "click-anywhere"]},
       icon: "hero-magnifying-glass"
