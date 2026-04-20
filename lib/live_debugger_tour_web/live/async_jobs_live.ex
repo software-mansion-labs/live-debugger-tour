@@ -74,7 +74,8 @@ defmodule LiveDebuggerTourWeb.Live.AsyncJobsLive do
   def mount(_params, _session, socket) do
     socket =
       socket
-      |> assign(:async_status, "Idle")
+      |> assign(:slow_status, "Idle")
+      |> assign(:cancelable_status, "Idle")
       |> assign(:cancelable_loading, false)
       |> assign(:async_data, nil)
       |> tour_page_assigns(@tour_steps)
@@ -102,7 +103,14 @@ defmodule LiveDebuggerTourWeb.Live.AsyncJobsLive do
           <.interactive_demo_section
             :if={step[:demo]}
             demo={step.demo}
-            async_status={@async_status}
+            status={
+              case step.demo.event do
+                "start_slow_async" -> @slow_status
+                "start_cancelable_async" -> @cancelable_status
+                _ -> "Idle"
+              end
+            }
+            async_data={@async_data}
             cancelable_loading={@cancelable_loading}
           />
         </TourComponents.tour_step>
@@ -123,7 +131,7 @@ defmodule LiveDebuggerTourWeb.Live.AsyncJobsLive do
   def handle_event("start_slow_async", _params, socket) do
     socket =
       socket
-      |> assign(:async_status, "Running slow task (3s)...")
+      |> assign(:slow_status, "Running (3s)")
       |> start_async(:slow_task, fn ->
         Process.sleep(3000)
         {:ok, "Done"}
@@ -135,9 +143,7 @@ defmodule LiveDebuggerTourWeb.Live.AsyncJobsLive do
   @impl true
   def handle_event("start_assign_async", _params, socket) do
     socket =
-      socket
-      |> assign(:async_status, "Fetching @async_data (2s)...")
-      |> assign_async(:async_data, fn ->
+      assign_async(socket, :async_data, fn ->
         Process.sleep(2000)
         {:ok, %{async_data: "Loaded!"}}
       end)
@@ -149,7 +155,7 @@ defmodule LiveDebuggerTourWeb.Live.AsyncJobsLive do
   def handle_event("start_cancelable_async", _params, socket) do
     socket =
       socket
-      |> assign(:async_status, "Running cancelable task...")
+      |> assign(:cancelable_status, "Running task")
       |> assign(:cancelable_loading, true)
       |> start_async(:cancelable_task, fn ->
         Process.sleep(10_000)
@@ -165,14 +171,14 @@ defmodule LiveDebuggerTourWeb.Live.AsyncJobsLive do
       socket
       |> cancel_async(:cancelable_task)
       |> assign(:cancelable_loading, false)
-      |> assign(:async_status, "Task cancelled manually")
+      |> assign(:cancelable_status, "Task cancelled")
 
     {:noreply, socket}
   end
 
   @impl true
   def handle_async(:slow_task, {:ok, _result}, socket) do
-    {:noreply, assign(socket, :async_status, "Slow task completed")}
+    {:noreply, assign(socket, :slow_status, "Task completed")}
   end
 
   @impl true
@@ -180,7 +186,7 @@ defmodule LiveDebuggerTourWeb.Live.AsyncJobsLive do
     socket =
       socket
       |> assign(:cancelable_loading, false)
-      |> assign(:async_status, "Cancelable task completed")
+      |> assign(:cancelable_status, "Task completed")
 
     {:noreply, socket}
   end
@@ -190,16 +196,33 @@ defmodule LiveDebuggerTourWeb.Live.AsyncJobsLive do
     socket =
       socket
       |> assign(:cancelable_loading, false)
-      |> assign(:async_status, "Task exited unexpectedly")
+      |> assign(:cancelable_status, "Task cancelled")
 
     {:noreply, socket}
   end
 
-  attr :async_status, :string, required: true
+  attr :status, :string, required: true
   attr :cancelable_loading, :boolean, default: false
+  attr :async_data, :any, default: nil
   attr :demo, :map, required: true
 
   defp interactive_demo_section(assigns) do
+    assigns =
+      if assigns.demo.event == "start_assign_async" do
+        status =
+          cond do
+            assigns.async_data == nil -> "Idle"
+            Map.get(assigns.async_data, :ok?) -> "Task completed"
+            Map.get(assigns.async_data, :failed) -> "Task failed"
+            Map.get(assigns.async_data, :loading) -> "Running (2s)"
+            true -> "Idle"
+          end
+
+        assign(assigns, :display_status, status)
+      else
+        assign(assigns, :display_status, assigns.status)
+      end
+
     ~H"""
     <div class="card shadow-sm mt-4 border border-base-300">
       <div class="card-body p-4">
@@ -217,7 +240,7 @@ defmodule LiveDebuggerTourWeb.Live.AsyncJobsLive do
 
         <div class="flex items-center gap-4 mt-3">
           <div class="badge badge-lg badge-outline font-mono truncate max-w-[200px] sm:max-w-xs">
-            status: {@async_status}
+            status: {@display_status}
           </div>
 
           <button
