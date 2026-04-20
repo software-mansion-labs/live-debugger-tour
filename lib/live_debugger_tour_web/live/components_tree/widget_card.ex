@@ -26,9 +26,9 @@ defmodule LiveDebuggerTourWeb.Live.ComponentsTree.WidgetCard do
         <p class="text-2xl font-bold mt-1">{@value}</p>
         <p class="text-xs text-base-content/60">{@description}</p>
         <div class="mt-2">
-          <button phx-click="click" phx-target={@myself} class="btn btn-xs btn-ghost">
-            <.icon name="hero-cursor-arrow-rays" class="size-3" /> Interact
-            <span :if={@clicks > 0} class="badge badge-xs badge-primary">{@clicks}</span>
+          <button phx-click="click" phx-target={@myself} class="btn btn-sm btn-outline">
+            <.icon name="hero-cursor-arrow-rays" class="size-4" /> Interact
+            <span :if={@clicks > 0} class="badge badge-sm badge-primary">{@clicks}</span>
           </button>
         </div>
       </div>

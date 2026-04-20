@@ -134,7 +134,7 @@ defmodule LiveDebuggerTourWeb.Live.ComponentsTreeLive do
           <p class="text-sm">
             The Components Tree shows the hierarchy of all LiveComponents rendered inside
             a LiveView. Each component gets a unique CID (Component ID) that you can click
-            to inspect its assigns, state, and rendered output. Hovering a node highlights
+            to inspect its assigns and callback traces. Hovering a node highlights
             the corresponding element in the browser.
           </p>
         </div>
