@@ -151,8 +151,7 @@ defmodule LiveDebuggerTourWeb.Live.ComponentsTreeLive do
           </p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
             <.live_component
-              :for={widget <- @widgets}
-              :if={MapSet.member?(@visible, widget.id)}
+              :for={widget <- Enum.filter(@widgets, &MapSet.member?(@visible, &1.id))}
               module={WidgetCard}
               id={"widget-#{widget.id}"}
               label={widget.label}

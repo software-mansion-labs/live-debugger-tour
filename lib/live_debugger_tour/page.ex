@@ -130,8 +130,7 @@ defmodule LiveDebuggerTour.Page do
     completed = MapSet.put(socket.assigns.completed_steps, step_id)
 
     socket =
-      params["action"]
-      |> case do
+      case params["action"] do
         "client_spotlight" ->
           Phoenix.LiveView.push_event(socket, "tour:client-spotlight", %{target: params["target"]})
 
