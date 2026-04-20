@@ -7,17 +7,17 @@ defmodule LiveDebuggerTourWeb.Live.StreamsLive do
     description:
       "Monitor how Phoenix Streams manage large collections. Watch stream operations like insert, update, and delete happen in real-time without bloating the socket state."
 
-  alias LiveDebugger.App.Web.Helpers.Routes, as: RoutesHelper
   alias LiveDebuggerTourWeb.Components.TourComponents
+  alias Phoenix.LiveView.JS
 
   @tour_steps [
     %{
       id: 1,
       title: "Live Stream Preview",
       description:
-        "On the <span class=\"text-primary font-bold\">left side</span>, you'll find the Live Stream Preview. This panel reflects the true state of the UI. Watch it update instantly as you trigger actions in the steps below.",
-      target: "#stream-preview-card",
-      action: {:highlight, [dismiss: "click-anywhere"]},
+        "Before we begin, let's open the Live Stream Preview. Look for the floating button on the <span class=\"text-primary font-bold\">right edge of the screen</span>. Click it to slide out a panel that will show you exactly how the UI reacts to your stream operations.",
+      target: "stream-preview-button",
+      action: {:client_spotlight, []},
       icon: "hero-view-columns"
     },
     %{
@@ -88,9 +88,9 @@ defmodule LiveDebuggerTourWeb.Live.StreamsLive do
       target: :callback_traces_first_trace,
       demo: %{
         event: "insert_item",
-        label: "Trigger Trace",
-        icon: "hero-bolt",
-        color: "btn-accent"
+        label: "Insert Item",
+        icon: "hero-plus",
+        color: "btn-primary"
       },
       action: {:spotlight, [dismiss: "click-anywhere"]},
       icon: "hero-cpu-chip"
@@ -99,12 +99,6 @@ defmodule LiveDebuggerTourWeb.Live.StreamsLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    if connected?(socket) do
-      self()
-      |> RoutesHelper.debugger_node_inspector()
-      |> LiveDebugger.Tour.redirect()
-    end
-
     socket =
       socket
       |> assign(:current_id, 0)
@@ -125,65 +119,23 @@ defmodule LiveDebuggerTourWeb.Live.StreamsLive do
       />
       <TourComponents.progress_bar tour_steps={@tour_steps} completed_steps={@completed_steps} />
 
-      <%!-- UKŁAD DWUKOLUMNOWY --%>
-      <div class="flex flex-col lg:flex-row gap-6 mt-6 items-start relative z-10">
-        <%!-- LEWA KOLUMNA: PLAYGROUND (Sticky) --%>
-        <div
-          id="stream-preview-card"
-          class="w-full lg:w-1/3 card bg-base-100 shadow-sm border border-base-300 lg:sticky lg:top-6"
+      <.stream_preview_panel streams={@streams} />
+
+      <div id="tour-cards" class="space-y-4 relative z-10">
+        <TourComponents.tour_step
+          :for={step <- @tour_steps}
+          step={step}
+          completed={MapSet.member?(@completed_steps, step.id)}
         >
-          <div class="card-body p-4">
-            <h3 class="font-bold text-lg flex items-center gap-2 border-b border-base-200 pb-3 mb-2">
-              <.icon name="hero-list-bullet" class="size-5 text-primary" /> Live Stream Preview
-            </h3>
-
-            <%!-- Kontener o stałej maksymalnej wysokości ze scrollem --%>
-            <div class="overflow-y-auto max-h-[350px] pr-2">
-              <ul
-                id="tour-stream-preview"
-                phx-update="stream"
-                class="flex flex-col gap-2 min-h-[100px]"
-              >
-                <li
-                  :for={{dom_id, item} <- @streams.tour_items}
-                  id={dom_id}
-                  class="p-3 bg-base-200/50 border border-base-300 rounded shadow-sm flex justify-between items-center animate-in fade-in slide-in-from-left-4"
-                >
-                  <div class="flex flex-col">
-                    <span class="font-bold text-sm">{item.value}</span>
-                    <span class="font-mono text-xs text-base-content/50">ID: {dom_id}</span>
-                  </div>
-                  <span class="badge badge-ghost badge-sm">R: {item.random}</span>
-                </li>
-
-                <div
-                  id="empty-stream-state"
-                  class="text-center text-sm text-base-content/50 my-12 only:block hidden"
-                >
-                  Stream is empty.<br />Click "Insert Item" on the right.
-                </div>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <%!-- PRAWA KOLUMNA: KARTY SAMOUCZKA --%>
-        <div id="tour-cards" class="w-full lg:w-2/3 space-y-4">
-          <TourComponents.tour_step
-            :for={step <- @tour_steps}
-            step={step}
-            completed={MapSet.member?(@completed_steps, step.id)}
-          >
-            <.interactive_demo_section :if={step[:demo]} demo={step.demo} />
-          </TourComponents.tour_step>
-        </div>
+          <.interactive_demo_section :if={step[:demo]} demo={step.demo} />
+        </TourComponents.tour_step>
       </div>
 
+      <TourComponents.client_spotlight_hook />
       <TourComponents.clear_spotlight_button :if={@current_step != nil} />
 
-      <div class="flex justify-center gap-3 mt-12">
+      <div class="flex justify-center gap-3 mt-8">
         <TourComponents.restart_page url={@page_path} />
-        <TourComponents.reload_debugger url={RoutesHelper.debugger_node_inspector(self())} />
       </div>
 
       <TourComponents.navigation prev_page={@prev_page} next_page={@next_page} />
@@ -265,6 +217,66 @@ defmodule LiveDebuggerTourWeb.Live.StreamsLive do
             {@demo.label}
           </button>
         </div>
+      </div>
+    </div>
+    """
+  end
+
+  attr :streams, :any, required: true
+
+  defp stream_preview_panel(assigns) do
+    ~H"""
+    <div class="fixed right-0 top-1/3 z-[9999]">
+      <button
+        id="stream-preview-button"
+        class="btn btn-primary shadow-lg rounded-r-none pl-3 pr-4 py-2 flex items-center gap-2 hover:pr-6 transition-all"
+        phx-click={JS.remove_class("translate-x-full", to: "#stream-side-panel")}
+      >
+        <.icon name="hero-chevron-left" class="size-4" /> Preview
+      </button>
+    </div>
+
+    <div
+      id="stream-side-panel"
+      class="fixed right-0 top-0 h-full w-80 bg-base-100 shadow-2xl z-[10000] transform transition-transform duration-300 translate-x-full border-l border-base-300 flex flex-col"
+    >
+      <div class="p-4 border-b border-base-200 flex justify-between items-center bg-base-200/50">
+        <h3 class="font-bold text-lg flex items-center gap-2">
+          <.icon name="hero-list-bullet" class="size-5 text-primary" /> Live Stream Preview
+        </h3>
+        <button
+          class="btn btn-sm btn-circle btn-ghost"
+          phx-click={JS.add_class("translate-x-full", to: "#stream-side-panel")}
+        >
+          <.icon name="hero-x-mark" class="size-5" />
+        </button>
+      </div>
+
+      <div class="p-4 flex-1 overflow-y-auto bg-base-100">
+        <p class="text-xs text-base-content/70 mb-4 pb-2 border-b border-base-200">
+          This panel reflects the true state of the UI. Watch it update instantly as you complete the tour steps.
+        </p>
+
+        <ul id="tour-stream-preview" phx-update="stream" class="flex flex-col gap-2">
+          <li
+            :for={{dom_id, item} <- @streams.tour_items}
+            id={dom_id}
+            class="p-3 bg-base-100 border border-base-200 rounded shadow-sm flex justify-between items-center animate-in fade-in slide-in-from-right-4"
+          >
+            <div class="flex flex-col">
+              <span class="font-bold text-sm">{item.value}</span>
+              <span class="font-mono text-xs text-base-content/50">ID: {dom_id}</span>
+            </div>
+            <span class="badge badge-ghost badge-sm">R: {item.random}</span>
+          </li>
+
+          <div
+            id="empty-stream-state"
+            class="text-center text-sm text-base-content/50 my-8 only:block hidden"
+          >
+            Stream is empty.<br />Click "Insert Item" in the tour.
+          </div>
+        </ul>
       </div>
     </div>
     """
