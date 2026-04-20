@@ -71,7 +71,14 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
             phx-click={if not @disabled, do: tour_action(@step)}
             class="btn btn-sm btn-soft"
           >
-            <.icon name="hero-viewfinder-circle" class="size-4" /> Spotlight
+            <%= case @step[:action] do %>
+              <% {:highlight, _opts} -> %>
+                <.icon name="hero-viewfinder-circle" class="size-4" /> Highlight
+              <% {:spotlight, _opts} -> %>
+                <.icon name="hero-viewfinder-circle" class="size-4" /> Spotlight
+              <% {:client_spotlight, _opts} -> %>
+                <.icon name="hero-viewfinder-circle" class="size-4" /> Spotlight
+            <% end %>
           </button>
           {render_slot(@button, @step_with_meta)}
         </div>
@@ -244,7 +251,8 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
   end
 
   defp tour_action(%{id: id, action: {:client_spotlight, []}, target: target}) do
-    JS.push("activate_step", value: %{step: id, action: :client_spotlight, target: target})
+    Tour.clear_JS()
+    |> JS.push("activate_step", value: %{step: id, action: :client_spotlight, target: target})
   end
 
   defp tour_action(%{id: id, action: {:spotlight, opts}, target: target}) do

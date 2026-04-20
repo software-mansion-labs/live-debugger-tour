@@ -7,6 +7,7 @@ defmodule LiveDebuggerTourWeb.Live.ComponentsTreeLive do
     description:
       "Visualize complex UI hierarchies with multiple LiveComponents, using the highlight feature to map the tree structure to the browser view."
 
+  alias LiveDebugger.Tour
   alias LiveDebugger.App.Web.Helpers.Routes, as: RoutesHelper
   alias LiveDebuggerTourWeb.Components.TourComponents
   alias LiveDebuggerTourWeb.Live.ComponentsTree.WidgetCard
@@ -194,7 +195,21 @@ defmodule LiveDebuggerTourWeb.Live.ComponentsTreeLive do
           step={step}
           completed={MapSet.member?(@completed_steps, step.id)}
           disabled={step.id != 1 and not MapSet.member?(@completed_steps, 1)}
-        />
+        >
+          <:button :if={step.id == 1}>
+            <button
+              id={"tour-btn-#{step.id}"}
+              phx-click={
+                Tour.highlight_JS("#components-tree")
+                |> JS.concat(Tour.highlight_JS(:show_components_tree, clear: false))
+                |> JS.push("activate_step", value: %{step: step.id})
+              }
+              class="btn btn-sm btn-soft"
+            >
+              <.icon name="hero-viewfinder-circle" class="size-4" /> Highlight
+            </button>
+          </:button>
+        </TourComponents.tour_step>
       </div>
 
       <TourComponents.client_spotlight_hook />

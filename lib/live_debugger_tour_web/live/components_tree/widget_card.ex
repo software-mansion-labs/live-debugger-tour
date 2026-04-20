@@ -1,4 +1,7 @@
 defmodule LiveDebuggerTourWeb.Live.ComponentsTree.WidgetCard do
+  @moduledoc """
+  Example LiveComponent used to showcase debugging capabilites of LiveDebugger
+  """
   use LiveDebuggerTourWeb, :live_component
 
   @impl true
