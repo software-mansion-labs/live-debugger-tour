@@ -159,7 +159,6 @@ defmodule LiveDebuggerTourWeb.Live.StreamsLive do
     {:noreply, socket}
   end
 
-  @impl true
   def handle_event("update_item", _params, socket) do
     last_id = socket.assigns.current_id - 1
 
@@ -177,7 +176,6 @@ defmodule LiveDebuggerTourWeb.Live.StreamsLive do
     end
   end
 
-  @impl true
   def handle_event("delete_item", _params, socket) do
     last_id = socket.assigns.current_id - 1
 
@@ -193,16 +191,6 @@ defmodule LiveDebuggerTourWeb.Live.StreamsLive do
     else
       {:noreply, put_flash(socket, :error, "No items to delete!")}
     end
-  end
-
-  @impl true
-  def handle_event("reset_stream", _params, socket) do
-    socket =
-      socket
-      |> stream(:tour_items, [], reset: true)
-      |> assign(:current_id, 0)
-
-    {:noreply, socket}
   end
 
   attr :demo, :map, required: true
@@ -273,12 +261,12 @@ defmodule LiveDebuggerTourWeb.Live.StreamsLive do
             <span class="badge badge-ghost badge-sm">R: {item.random}</span>
           </li>
 
-          <div
+          <li
             id="empty-stream-state"
             class="text-center text-sm text-base-content/50 my-8 only:block hidden"
           >
             Stream is empty.<br />Click "Insert Item" in the tour.
-          </div>
+          </li>
         </ul>
       </div>
     </div>
