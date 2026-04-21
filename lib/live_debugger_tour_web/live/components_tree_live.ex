@@ -163,7 +163,7 @@ defmodule LiveDebuggerTourWeb.Live.ComponentsTreeLive do
           </div>
           <div
             id="widget-controls"
-            class="flex bg-base-100 flex-wrap gap-2 mt-4 pt-4 border-t border-base-300"
+            class="flex justify-center bg-base-100 flex-wrap gap-2 mt-4 py-4 border-t border-base-300"
           >
             <button
               :for={widget <- @widgets}
