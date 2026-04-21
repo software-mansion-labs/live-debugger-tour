@@ -62,9 +62,7 @@ defmodule LiveDebuggerTour.MixProject do
       {:bandit, "~> 1.5"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:live_debugger,
-       github: "software-mansion/live-debugger",
-       branch: "live-debugger-tour-dev",
-       only: [:dev, :test]}
+       github: "software-mansion/live-debugger", branch: "live-debugger-tour", only: [:dev, :test]}
     ]
   end
 
