@@ -90,6 +90,7 @@ defmodule LiveDebuggerTour.Page do
       page_title: meta.title,
       page_number: meta.number,
       page_path: meta.path,
+      coming_soon: Map.get(meta, :coming_soon, false),
       current_step: nil,
       completed_steps: MapSet.new(),
       tour_steps: tour_steps,
@@ -121,10 +122,24 @@ defmodule LiveDebuggerTour.Page do
     {:halt, Phoenix.Component.assign(socket, :completed_steps, completed_steps)}
   end
 
-  defp handle_event_hook("activate_step", %{"step" => step_id}, socket) do
+  defp handle_event_hook(
+         "activate_step",
+         %{"step" => step_id} = params,
+         socket
+       ) do
     completed = MapSet.put(socket.assigns.completed_steps, step_id)
 
-    {:halt, assign_completed(socket, step_id, completed)}
+    socket =
+      case params["action"] do
+        "client_spotlight" ->
+          Phoenix.LiveView.push_event(socket, "tour:client-spotlight", %{target: params["target"]})
+
+        _ ->
+          socket
+      end
+      |> assign_completed(step_id, completed)
+
+    {:halt, socket}
   end
 
   defp handle_event_hook("deactivate_step", %{"step" => step_id}, socket) do
