@@ -2,6 +2,8 @@
 
 An interactive, step-by-step tutorial for [LiveDebugger](https://github.com/software-mansion/live-debugger) — a real-time debugging tool for Phoenix LiveView. Each tour step is a self-contained LiveView that introduces a LiveDebugger feature with a minimal, hands-on example you can inspect and debug in real time.
 
+<img alt="LiveDebugger Tour - Start Debugging page" src="https://github.com/user-attachments/assets/16cef8e8-3f3f-4c7a-a97d-c825fc64ce02" />
+
 ## Prerequisites
 
 - Elixir ~> 1.15
