@@ -15,11 +15,11 @@ LiveDebugger is included as a **local path dependency** (`{:live_debugger, path:
 Each topic maps to a numbered tour step LiveView:
 
 1. [x] **Start debugging** — Explore the Node Info panel to identify the process PID, module path, and learn how to jump from the debugger to the code editor.
-2. [ ] **Inspecting assigns** — Navigate socket.assigns state using search, pinning, and history tracking. Observe how "green dots" highlight modified values.
-3. [ ] **Callback traces** — Start/stop traces to analyze LiveView lifecycle execution times, filter specific events, and manage memory by removing old traces.
+2. [x] **Inspecting assigns** — Monitor LiveView state changes in real-time. Use the interactive demo to see how values update, search complex data, pin variables, and track mutation history.
+3. [x] **Callback traces** — Start/stop traces to analyze LiveView lifecycle execution times, filter specific events, and manage memory by removing old traces.
 4. [x] **Dead LiveView & Exceptions** — Trigger a deliberate crash with a "Boom" button to see how the debugger displays the final state of a dead process and identifies its successor.
 5. [x] **Components tree** — Visualize complex UI hierarchies with multiple LiveComponents, using the highlight feature to map the tree structure to the browser view.
-6. [ ] **Async jobs** — Observe `assign_async` behavior to see how background tasks transition from loading states to successful data injections in real-time.
+6. [x] **Async jobs** — Observe `assign_async` behavior to see how background tasks transition from loading states to successful data injections in real-time.
 7. [ ] **Streams** — Examine how Phoenix Streams are handled by the debugger, showing how large collections are efficiently managed and updated.
 8. [ ] **Global callback traces** — Analyze cross-node communication by filtering messages sent from a child LiveComponent to its parent LiveView.
 9. [ ] **Analyzing diffs** — Dive into the actual data payloads (diffs) sent over the wire to the browser to understand how Phoenix optimizes UI updates.
