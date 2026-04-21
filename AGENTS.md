@@ -16,7 +16,7 @@ Each topic maps to a numbered tour step LiveView:
 
 1. [x] **Start debugging** — Explore the Node Info panel to identify the process PID, module path, and learn how to jump from the debugger to the code editor.
 2. [x] **Inspecting assigns** — Monitor LiveView state changes in real-time. Use the interactive demo to see how values update, search complex data, pin variables, and track mutation history.
-3. [ ] **Callback traces** — Start/stop traces to analyze LiveView lifecycle execution times, filter specific events, and manage memory by removing old traces.
+3. [x] **Callback traces** — Start/stop traces to analyze LiveView lifecycle execution times, filter specific events, and manage memory by removing old traces.
 4. [x] **Dead LiveView & Exceptions** — Trigger a deliberate crash with a "Boom" button to see how the debugger displays the final state of a dead process and identifies its successor.
 5. [ ] **Components tree** — Visualize complex UI hierarchies with multiple LiveComponents, using the highlight feature to map the tree structure to the browser view.
 6. [x] **Async jobs** — Observe `assign_async` behavior to see how background tasks transition from loading states to successful data injections in real-time.
