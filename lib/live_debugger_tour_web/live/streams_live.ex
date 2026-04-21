@@ -13,18 +13,27 @@ defmodule LiveDebuggerTourWeb.Live.StreamsLive do
   @tour_steps [
     %{
       id: 1,
-      title: "Live Stream Preview",
+      title: "Stream Preview",
       description:
-        "Before we begin, let's open the Live Stream Preview. Look for the floating button on the <span class=\"text-primary font-bold\">right edge of the screen</span>. Click it to slide out a panel that will show you exactly how the UI reacts to your stream operations.",
+        "Before we begin, let's open the Stream Preview. Look for the floating button on the <span class=\"text-primary font-bold\">right edge of the screen</span>. Click it to slide out a panel that will show you exactly how the UI reacts to your stream operations.",
       target: "stream-preview-button",
       action: {:client_spotlight, []},
       icon: "hero-view-columns"
     },
     %{
       id: 2,
-      title: "Stream Insertions",
+      title: "Streams Overview",
       description:
-        "Streams keep large collections out of server memory by storing them on the client. LiveDebugger intercepts these payloads. Try inserting a new item below and watch it appear in the debugger's Streams section.",
+        "This section lists all streams managed by your LiveView. Streams handle large lists efficiently by keeping them strictly on the client. The debugger automatically tracks all registered streams here.",
+      target: "#streams-section-container",
+      action: {:spotlight, [dismiss: "click-anywhere"]},
+      icon: "hero-rectangle-group"
+    },
+    %{
+      id: 3,
+      title: "Insertions",
+      description:
+        "LiveDebugger intercepts all stream payloads. Try inserting a new item below and watch it appear in the debugger.",
       target: "#streams-section-container",
       demo: %{
         event: "insert_item",
@@ -36,8 +45,17 @@ defmodule LiveDebuggerTourWeb.Live.StreamsLive do
       icon: "hero-bars-arrow-down"
     },
     %{
-      id: 3,
-      title: "Stream Updates",
+      id: 4,
+      title: "DOM Highlighting",
+      description:
+        "<b>Hover your mouse over the newly inserted item inside the debugger panel</b>, and you'll see the corresponding HTML element highlighted directly in the Stream Preview.",
+      target: "#tour_items-stream > :first-child",
+      action: {:spotlight, [dismiss: "click-anywhere"]},
+      icon: "hero-cursor-arrow-rays"
+    },
+    %{
+      id: 5,
+      title: "Updates",
       description:
         "When you update an existing item using <code>stream_insert/4</code>, LiveView identifies it by its DOM ID and patches only that specific element. Click the button below to update the last inserted item and spot the change indicator.",
       target: "#streams-section-container",
@@ -51,10 +69,10 @@ defmodule LiveDebuggerTourWeb.Live.StreamsLive do
       icon: "hero-pencil-square"
     },
     %{
-      id: 4,
-      title: "Stream Deletions",
+      id: 6,
+      title: "Deletions",
       description:
-        "Removing items is just as efficient. Triggering <code>stream_delete/3</code> tells the client to drop the element. Try deleting the last item and watch it vanish from the debugger's tracking list.",
+        "Removing items is just as efficient. Triggering <code>stream_delete/3</code> tells the client to drop the element. Try deleting the last item and watch it vanish from the tracking list.",
       target: "#streams-section-container",
       demo: %{
         event: "delete_item",
@@ -66,25 +84,10 @@ defmodule LiveDebuggerTourWeb.Live.StreamsLive do
       icon: "hero-minus-circle"
     },
     %{
-      id: 5,
-      title: "Stream Resets",
-      description:
-        "Sometimes you need to fetch a fresh list or clear the UI. Passing the <code>reset: true</code> option completely flushes the client's collection. Try resetting the stream below.",
-      target: "#streams-section-container",
-      demo: %{
-        event: "reset_stream",
-        label: "Reset Stream",
-        icon: "hero-arrow-path-rounded-square",
-        color: "btn-warning"
-      },
-      action: {:spotlight, [dismiss: "click-anywhere"]},
-      icon: "hero-archive-box-x-mark"
-    },
-    %{
-      id: 6,
+      id: 7,
       title: "Trace Integration",
       description:
-        "LiveDebugger extracts all stream operations directly from LiveView lifecycle events. Try triggering an action below, and look at the highlighted trace in the debugger. You'll see exactly which callback rendered the stream mutation.",
+        "LiveDebugger extracts all stream operations directly from LiveView lifecycle traces. Try triggering an action below, and look at the trace in the debugger. You'll see exactly which callback rendered the stream mutation.",
       target: :callback_traces_first_trace,
       demo: %{
         event: "insert_item",
@@ -242,7 +245,7 @@ defmodule LiveDebuggerTourWeb.Live.StreamsLive do
     >
       <div class="p-4 border-b border-base-200 flex justify-between items-center bg-base-200/50">
         <h3 class="font-bold text-lg flex items-center gap-2">
-          <.icon name="hero-list-bullet" class="size-5 text-primary" /> Live Stream Preview
+          <.icon name="hero-list-bullet" class="size-5 text-primary" /> Stream Preview
         </h3>
         <button
           class="btn btn-sm btn-circle btn-ghost"
