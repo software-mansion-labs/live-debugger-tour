@@ -5,7 +5,7 @@ defmodule LiveDebuggerTourWeb.Live.StreamsLive do
     number: 7,
     title: "Streams",
     description:
-      "Monitor how Phoenix Streams manage large collections. Watch stream operations like insert, update, and delete happen in real-time without bloating the socket state."
+      "Monitor how Phoenix Streams manage large collections. Watch stream operations like insert, update, and delete happen in real-time."
 
   alias LiveDebuggerTourWeb.Components.TourComponents
   alias Phoenix.LiveView.JS
