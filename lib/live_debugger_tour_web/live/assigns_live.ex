@@ -50,7 +50,7 @@ defmodule LiveDebuggerTourWeb.Live.AssignsLive do
     },
     %{
       id: 5,
-      title: "Pinned <br> assigns",
+      title: "Pinned assigns",
       description:
         "Once pinned, assigns stay in this dedicated section at the top of your view. This is incredibly useful for tracking crucial state changes without losing them in a large list.",
       target: :assigns_pinned,
@@ -59,7 +59,7 @@ defmodule LiveDebuggerTourWeb.Live.AssignsLive do
     },
     %{
       id: 6,
-      title: "Assigns <br> history",
+      title: "Assigns history",
       description:
         "Track state changes over time to see exactly how consecutive actions affected your component. Click the counter a few times, then check the history to see the sequence of mutations step by step.",
       target: :assigns_history_button,

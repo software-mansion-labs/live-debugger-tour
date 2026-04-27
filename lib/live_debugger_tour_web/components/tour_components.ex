@@ -93,7 +93,7 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
 
   def progress_bar(assigns) do
     ~H"""
-    <ul id="tour-progress" class="steps steps-horizontal w-full mb-8">
+    <ul id="tour-progress" class="steps steps-vertical md:steps-horizontal w-full mb-8">
       <%= for step <- @tour_steps do %>
         <li class={[
           "step",
