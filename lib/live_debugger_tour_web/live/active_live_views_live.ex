@@ -191,7 +191,7 @@ defmodule LiveDebuggerTourWeb.Live.ActiveLiveViewsLive do
           :for={step <- @tour_steps}
           step={step}
           completed={MapSet.member?(@completed_steps, step.id)}
-          disabled={step.id in [3, 4, 5, 6, 7] and not MapSet.member?(@completed_steps, 2)}
+          disabled={step.id > 2 and not MapSet.member?(@completed_steps, 2)}
         />
       </div>
 
