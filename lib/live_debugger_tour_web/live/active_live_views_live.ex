@@ -91,7 +91,7 @@ defmodule LiveDebuggerTourWeb.Live.ActiveLiveViewsLive do
           "<span class=\"text-warning font-bold\">Dead LiveViews</span> section. " <>
           "When a process terminates, its final state is preserved here so you can inspect its " <>
           "<code>assigns</code> and callback traces post-mortem. " <>
-          "Toggle workers off in the pool above and watch them land in this list. ",
+          "Toggle workers off in the pool above or refresh this page and watch them land in this list. ",
       target: "#dead-live-views",
       action: {:spotlight, [dismiss: "click-anywhere"]},
       icon: "hero-rectangle-stack"
