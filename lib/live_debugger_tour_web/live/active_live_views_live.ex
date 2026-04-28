@@ -7,6 +7,7 @@ defmodule LiveDebuggerTourWeb.Live.ActiveLiveViewsLive do
     description:
       "Use the dynamic dashboard to see all currently running LiveView processes across the application as they connect and disconnect."
 
+  alias LiveDebugger.Tour
   alias LiveDebugger.App.Web.Helpers.Routes, as: RoutesHelper
   alias LiveDebuggerTourWeb.Components.TourComponents
   alias LiveDebuggerTourWeb.Live.ActiveLiveViews.WorkerLive
@@ -69,7 +70,7 @@ defmodule LiveDebuggerTourWeb.Live.ActiveLiveViewsLive do
       id: 5,
       title: "Navigate to different LiveView",
       description:
-        "Using Associated LiveViews panel you can quickly navigate between nested LiveViews and its parents.",
+        "Using <span class=\"text-success font-bold\">Associated LiveViews</span> panel you can quickly navigate between nested LiveViews and its parents.",
       target: "#associated-live-views",
       action: {:highlight, [dismiss: "click-anywhere"]},
       icon: "hero-arrow-right-circle"
@@ -192,7 +193,21 @@ defmodule LiveDebuggerTourWeb.Live.ActiveLiveViewsLive do
           step={step}
           completed={MapSet.member?(@completed_steps, step.id)}
           disabled={step.id > 2 and not MapSet.member?(@completed_steps, 2)}
-        />
+        >
+          <:button :if={step.id == 5}>
+            <button
+              id={"tour-btn-#{step.id}"}
+              phx-click={
+                Tour.highlight_JS("#associated-live-views")
+                |> JS.concat(Tour.highlight_JS(:show_components_tree, clear: false))
+                |> JS.push("activate_step", value: %{step: step.id})
+              }
+              class="btn btn-sm btn-soft"
+            >
+              <.icon name="hero-viewfinder-circle" class="size-4" /> Highlight
+            </button>
+          </:button>
+        </TourComponents.tour_step>
       </div>
 
       <TourComponents.client_spotlight_hook />

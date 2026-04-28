@@ -93,16 +93,18 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
 
   def progress_bar(assigns) do
     ~H"""
-    <ul id="tour-progress" class="steps steps-vertical md:steps-horizontal w-full mb-8">
-      <%= for step <- @tour_steps do %>
-        <li class={[
-          "step",
-          if(MapSet.member?(@completed_steps, step.id), do: "step-success")
-        ]}>
-          {Phoenix.HTML.raw(step.title)}
-        </li>
-      <% end %>
-    </ul>
+    <div class="flex w-full">
+      <ul id="tour-progress" class="steps steps-vertical md:steps-horizontal mx-auto mb-8">
+        <%= for step <- @tour_steps do %>
+          <li class={[
+            "step",
+            if(MapSet.member?(@completed_steps, step.id), do: "step-success")
+          ]}>
+            {Phoenix.HTML.raw(step.title)}
+          </li>
+        <% end %>
+      </ul>
+    </div>
     """
   end
 
