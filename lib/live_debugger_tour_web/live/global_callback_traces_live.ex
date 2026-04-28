@@ -51,7 +51,7 @@ defmodule LiveDebuggerTourWeb.Live.GlobalCallbackTracesLive do
       id: 5,
       title: "Component Filtering",
       description:
-        "Because Global Traces capture everything, the list can grow rapidly. That is why filters are essential. Once tracing is stopped, open the Filters menu and select <b>ONLY</b> the <code>Receiver</code> component to isolate the exact messages it receives from the parent!",
+        "Because Global Traces capture everything, the list can grow rapidly. That is why filters are essential. Once tracing is stopped, open the Filters menu and select <b>ONLY</b> the <code>Receiver</code> component to isolate the exact messages it receives from the parent!<br><br> <b>Note:</b> If you don't see the filters sidebar, click the open button in the top right corner to reveal it.",
       target: "#filters-component-tree-collapse",
       action: {:highlight, [dismiss: "click-anywhere"]},
       icon: "hero-funnel"
