@@ -15,7 +15,7 @@ defmodule LiveDebuggerTourWeb.Live.ResourcesLive do
       id: 1,
       title: "Resources Navigation",
       description:
-        "You can always return to this view using the Resources tab in the debugger's main menu. This is where you will find the performance analysis of your process.",
+        "Look at the Resources tab in the debugger's main menu. This is where you will find the performance analysis of your process.",
       target: "#resources-navbar-item",
       action: {:highlight, [dismiss: "click-anywhere"]},
       icon: "hero-bars-3"
@@ -24,7 +24,7 @@ defmodule LiveDebuggerTourWeb.Live.ResourcesLive do
       id: 2,
       title: "Process Information",
       description:
-        "This section displays raw Erlang VM metrics for the current LiveView process. It tracks everything from memory consumption to reductions (CPU work) and the message queue length.",
+        "This section displays raw Erlang VM metrics for the current LiveView process.",
       target: "#process-info",
       action: {:spotlight, [dismiss: "click-anywhere"]},
       icon: "hero-server"
@@ -40,9 +40,9 @@ defmodule LiveDebuggerTourWeb.Live.ResourcesLive do
     },
     %{
       id: 4,
-      title: "Metrics & Legend",
+      title: "Metrics",
       description:
-        "The chart tracks: <b>Memory</b> (total), <b>Heap/Stack</b> (data memory), <b>Reductions</b> (CPU work), and <b>Message Queue</b>. <br><br> Click the labels in the chart legend to show or hide specific data series.",
+        "The chart tracks: <b>Memory</b>, <b>Heap/Stack</b>, <b>Reductions</b>, and <b>Message Queue</b>. <br><br> Click the labels in the chart legend to show or hide specific data series.",
       target: "#process-info-chart-wrapper",
       action: {:highlight, [dismiss: "click-anywhere"]},
       icon: "hero-list-bullet"
@@ -75,7 +75,9 @@ defmodule LiveDebuggerTourWeb.Live.ResourcesLive do
     {:ok, socket}
   end
 
-  @impl true
+
+
+@impl true
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash}>
@@ -85,6 +87,18 @@ defmodule LiveDebuggerTourWeb.Live.ResourcesLive do
         description="Monitor real-time performance graphs and watch how specific user interactions cause spikes or changes in system resource usage."
       />
       <TourComponents.progress_bar tour_steps={@tour_steps} completed_steps={@completed_steps} />
+
+      <div class="alert alert-info mb-6">
+        <.icon name="hero-information-circle" class="size-5" />
+        <div>
+          <p class="font-semibold">What is the Resources dashboard?</p>
+          <p class="text-sm">
+            It provides a real-time visualization of the Erlang VM metrics for the current LiveView process.
+            You can track total memory, heap and stack size, CPU work (reductions), and message queue length
+            over time to easily identify performance bottlenecks, heavy computations, or memory leaks.
+          </p>
+        </div>
+      </div>
 
       <div id="tour-cards" class="space-y-4 relative z-10">
         <TourComponents.tour_step
