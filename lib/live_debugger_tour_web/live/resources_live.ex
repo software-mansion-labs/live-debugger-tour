@@ -61,12 +61,6 @@ defmodule LiveDebuggerTourWeb.Live.ResourcesLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    if connected?(socket) do
-      self()
-      |> RoutesHelper.debugger_node_inspector()
-      |> LiveDebugger.Tour.redirect()
-    end
-
     socket =
       socket
       |> assign(:heavy_payload, nil)
@@ -75,9 +69,7 @@ defmodule LiveDebuggerTourWeb.Live.ResourcesLive do
     {:ok, socket}
   end
 
-
-
-@impl true
+  @impl true
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash}>
