@@ -179,9 +179,7 @@ defmodule LiveDebuggerTourWeb.Live.GlobalCallbackTracesLive do
     def update(%{new_message: {msg, ts}}, socket) do
       formatted_time =
         DateTime.from_unix!(ts, :millisecond)
-        |> DateTime.to_time()
-        |> Time.to_string()
-        |> String.slice(0..7)
+        |> Calendar.strftime("%H:%M:%S")
 
       new_log = "[#{formatted_time}] #{msg}"
 
