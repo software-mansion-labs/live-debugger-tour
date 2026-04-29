@@ -20,11 +20,11 @@ Each topic maps to a numbered tour step LiveView:
 4. [x] **Dead LiveView & Exceptions** — Trigger a deliberate crash with a "Boom" button to see how the debugger displays the final state of a dead process and identifies its successor.
 5. [x] **Components tree** — Visualize complex UI hierarchies with multiple LiveComponents, using the highlight feature to map the tree structure to the browser view.
 6. [x] **Async jobs** — Observe `assign_async` behavior to see how background tasks transition from loading states to successful data injections in real-time.
-7. [ ] **Streams** — Examine how Phoenix Streams are handled by the debugger, showing how large collections are efficiently managed and updated.
+7. [x] **Streams** — Examine how Phoenix Streams are handled by the debugger, showing how large collections are efficiently managed and updated.
 8. [ ] **Global callback traces** — Analyze cross-node communication by filtering messages sent from a child LiveComponent to its parent LiveView.
 9. [ ] **Analyzing diffs** — Dive into the actual data payloads (diffs) sent over the wire to the browser to understand how Phoenix optimizes UI updates.
 10. [ ] **Resources** — Monitor real-time performance graphs and watch how specific user interactions cause spikes or changes in system resource usage.
-11. [ ] **Active LiveViews** — Use the dynamic dashboard to see all currently running LiveView processes across the application as they connect and disconnect.
+11. [x] **Active LiveViews** — Use the dynamic dashboard to see all currently running LiveView processes across the application as they connect and disconnect.
 12. [ ] **Settings** — Overview of the customization options available to tweak the debugger UI and connection parameters.
 
 ## Project guidelines
