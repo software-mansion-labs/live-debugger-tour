@@ -115,37 +115,27 @@ defmodule LiveDebuggerTourWeb.Live.ResourcesLive do
   end
 
   @impl true
-  def handle_event("spike_memory", _params, socket) do
-    huge_binary = :crypto.strong_rand_bytes(30_000_000)
-
-    Process.send_after(self(), :clear_memory, 4000)
-
-    {:noreply, assign(socket, :heavy_payload, huge_binary)}
-  end
-
-  @impl true
   def handle_event("spike_heap", _params, socket) do
-    huge_list = Enum.to_list(1..1_000_000)
+    huge_list = Enum.to_list(1..100_000)
     Process.send_after(self(), :clear_memory, 4000)
-
     {:noreply, assign(socket, :heavy_payload, huge_list)}
   end
 
   @impl true
   def handle_event("spike_stack", _params, socket) do
-    blow_stack(20_000)
+    blow_stack(200_000)
     {:noreply, socket}
   end
 
   @impl true
   def handle_event("spike_cpu", _params, socket) do
-    Enum.reduce(1..2_000_000, 0, fn x, acc -> acc + :erlang.phash2(x) end)
+    Enum.reduce(1..200_000, 0, fn x, acc -> acc + :erlang.phash2(x) end)
     {:noreply, socket}
   end
 
   @impl true
   def handle_event("spike_msg_queue", _params, socket) do
-    Enum.each(1..50_000, fn _ -> send(self(), :ignored_message) end)
+    Enum.each(1..80_000, fn _ -> send(self(), :ignored_message) end)
     {:noreply, socket}
   end
 
@@ -155,9 +145,6 @@ defmodule LiveDebuggerTourWeb.Live.ResourcesLive do
     :erlang.garbage_collect(self())
     {:noreply, socket}
   end
-
-  @impl true
-  def handle_info(:ignored_message, socket), do: {:noreply, socket}
 
   @impl true
   def handle_info(_, socket), do: {:noreply, socket}
@@ -178,24 +165,36 @@ defmodule LiveDebuggerTourWeb.Live.ResourcesLive do
         </h3>
 
         <div class="flex flex-wrap gap-3">
-          <button phx-click="spike_memory" class="btn btn-sm btn-primary">
-            <.icon name="hero-circle-stack" class="size-4" /> Total Memory
-          </button>
-
-          <button phx-click="spike_heap" class="btn btn-sm btn-info">
+          <button
+            phx-click="spike_heap"
+            class="btn btn-sm bg-[#367e22] hover:bg-[#367e22]/80 text-white border-transparent"
+          >
             <.icon name="hero-queue-list" class="size-4" /> Heap Size
           </button>
 
-          <button phx-click="spike_stack" class="btn btn-sm btn-warning">
+          <button
+            phx-click="spike_stack"
+            class="btn btn-sm bg-[#efa638] hover:bg-[#efa638]/80 text-white border-transparent"
+          >
             <.icon name="hero-bars-arrow-up" class="size-4" /> Stack Size
           </button>
 
-          <button phx-click="spike_cpu" class="btn btn-sm btn-secondary">
+          <button
+            phx-click="spike_cpu"
+            class="btn btn-sm bg-[#76157e] hover:bg-[#76157e]/80 text-white border-transparent"
+          >
             <.icon name="hero-cpu-chip" class="size-4" /> CPU (Reductions)
           </button>
 
-          <button phx-click="spike_msg_queue" class="btn btn-sm btn-accent">
-            <.icon name="hero-envelope" class="size-4" /> Message Queue
+          <button
+            phx-click="spike_msg_queue"
+            class="btn btn-sm bg-[#6dfcfc] hover:bg-[#6dfcfc]/80 text-black border-transparent"
+          >
+            
+            <.icon
+              name="hero-envelope"
+              class="size-4"
+            /> Message Queue
           </button>
         </div>
 
