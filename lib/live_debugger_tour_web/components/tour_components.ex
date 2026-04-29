@@ -236,14 +236,15 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
     """
   end
 
-  attr :url, :string, required: true
+  attr :url, :string, default: "/"
+  attr :on_click, JS, default: nil
 
   def reload_debugger(assigns) do
     ~H"""
     <div id="reload-debugger" class="text-center mt-4">
       <button
         id="reload-debugger-btn"
-        phx-click={Tour.redirect_JS(@url) |> JS.push("clear_tour")}
+        phx-click={@on_click || Tour.redirect_JS(@url) |> JS.push("clear_tour")}
         class="btn btn-soft btn-sm"
       >
         Reload LiveDebugger
