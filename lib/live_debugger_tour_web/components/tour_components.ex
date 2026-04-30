@@ -227,7 +227,7 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
     <div id="restart-page" class="text-center mt-4">
       <.link
         id="restart-page-btn"
-        navigate={@url}
+        href={@url}
         class="btn btn-soft btn-sm"
       >
         Restart Page

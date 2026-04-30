@@ -12,12 +12,16 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
   alias LiveDebuggerTourWeb.Components.TourComponents
   alias Phoenix.LiveView.JS
 
+  alias LiveDebugger.App.Web.Endpoint, as: LiveDebuggerEndpoint
+
   @tour_steps [
     %{
       id: 1,
       title: "Highlight components",
       description:
-        "This is the toggle the <b>Components Tree</b> and <b>Active LiveViews</b> pages rely on to outline elements in your real browser tab when you hover a node in the debugger. Worth disabling if your page has hover styling that fights the overlay.",
+        "This is the toggle the <b>Components Tree</b> and <b>Active LiveViews</b> pages rely on " <>
+          "to outline elements in your real browser tab when you hover a node in the debugger. " <>
+          "Worth disabling if your page has hover styling that fights the overlay.",
       target: "div:has(> label > form > #highlight-in-browser-switch)",
       action: {:highlight, [dismiss: "click-anywhere"]},
       icon: "hero-sparkles"
@@ -26,7 +30,9 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
       id: 2,
       title: "Show Debug Button",
       description:
-        "With this off, the floating button disappears &ndash; but you can still open the debugger by visiting <code>localhost:4007</code> directly and picking the LiveView you want. The button is just a one-click shortcut.",
+        "With this off, the floating button disappears &ndash; but you can still open the debugger " <>
+          "by visiting <a href=\"#{LiveDebuggerEndpoint.static_url()}\">#{LiveDebuggerEndpoint.static_url()}</a> directly " <>
+          "and picking the LiveView you want. The button is just a one-click shortcut.",
       target: "div:has(> label > form > #debug-button-switch)",
       action: {:highlight, [dismiss: "click-anywhere"]},
       icon: "hero-cursor-arrow-rays"
@@ -35,7 +41,11 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
       id: 3,
       title: "Enable DeadView mode",
       description:
-        "Controls what happens when the LiveView you're inspecting dies. With it <b>ON</b>, the debugger pins to the dead process so you can browse its final assigns and last traces &ndash; the navbar swaps the green badge for a pink <b>Disconnected</b> one and shows a <b>Continue</b> button that jumps to the successor process. With it <b>OFF</b>, the debugger silently follows along to the new live process, so post-mortem inspection becomes impossible. " <>
+        "Controls what happens when the LiveView you're inspecting dies. With it <b>ON</b>, " <>
+          "the debugger pins to the dead process so you can browse its final assigns and last traces &ndash; " <>
+          "the navbar swaps the green badge for a pink <b>Disconnected</b> one and shows a <b>Continue</b> button " <>
+          "that jumps to the successor process. With it <b>OFF</b>, " <>
+          "the debugger silently follows along to the new live process, so post-mortem inspection becomes impossible. " <>
           "(Page 4 of this tour actually triggers a crash if you want to see DeadView mode in action.)",
       target: "div:has(> label > form > #dead-view-mode-switch)",
       action: {:highlight, [dismiss: "click-target"]},
@@ -75,7 +85,9 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
       id: 5,
       title: "Garbage Collection",
       description:
-        "Marked <b>High impact</b> for a reason. With <b>ON</b>, LiveDebugger periodically trims old trace data (default ETS cap: 5GB per process) so memory stays bounded. With <b>OFF</b>, a warning indicator surfaces in the navbar and memory grows for as long as your app runs. Keep it on for long-running dev work; turn it off only for short, focused sessions where you want every historical trace preserved.",
+        "Marked <b>High impact</b> for a reason. With <b>ON</b>, LiveDebugger periodically trims old trace data so memory stays bounded. " <>
+          "With <b>OFF</b>, a warning indicator surfaces in the navbar and memory grows for as long as your app runs. " <>
+          "Keep it on for long-running dev work; turn it off only for short, focused sessions where you want every historical trace preserved.",
       target: "div:has(> label > form > #garbage-collection-switch)",
       action: {:highlight, [dismiss: "click-target"]},
       icon: "hero-trash",
@@ -94,7 +106,9 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
       id: 6,
       title: "Refresh Tracing",
       description:
-        "Reloads traced modules and reattaches the tracer to your callbacks. Reach for it after Phoenix hot-reloads code or after you recompile in IEx — those events can detach the tracer silently, so traces stop appearing for affected modules until you click this.",
+        "Reloads traced modules and reattaches the tracer to your callbacks. " <>
+          "Reach for it after Phoenix hot-reloads code or after you recompile in IEx — those events can detach the tracer silently, " <>
+          "so traces stop appearing for affected modules until you click this.",
       target: :refresh_tracing_button,
       action: {:spotlight, [dismiss: "click-anywhere"]},
       icon: "hero-arrow-path"
@@ -118,7 +132,10 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
       |> tour_page_assigns(@tour_steps, redirect_url: RoutesHelper.settings())
 
     if connected?(socket) do
-      Process.send_after(self(), :enable_settings, 500)
+      Tour.enable_settings()
+
+      parent_pid = self()
+      spawn(fn -> reset_settings_on_process_exit(parent_pid) end)
     end
 
     {:ok, socket}
@@ -134,27 +151,6 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
         description="Walk through what each LiveDebugger setting actually changes — including the navbar indicators and panel behaviors that aren't spelled out in the inline descriptions."
       />
       <TourComponents.progress_bar tour_steps={@tour_steps} completed_steps={@completed_steps} />
-
-      <div class="alert alert-info mb-6">
-        <.icon name="hero-information-circle" class="size-5" />
-        <div>
-          <p class="text-sm">
-            Normally settings persist to disk between IEx sessions, and any value you also set in
-            <code>config :live_debugger</code>
-            takes precedence over what you toggle.
-            However during LiveDebugger Tour they are disabled to change except this tutorial page.
-            If you had LiveDebugger opened next to the tutorial you should be able to change settings now.
-            However if they are still locked by the tour you can unlock them manually.
-          </p>
-        </div>
-        <button
-          id="tour-btn-1"
-          phx-click={Tour.enable_settings_JS()}
-          class="btn btn-sm btn-outline"
-        >
-          <.icon name="hero-lock-open" class="size-4" /> Unlock
-        </button>
-      </div>
 
       <div id="tour-cards" class="space-y-4">
         <TourComponents.tour_step
@@ -196,11 +192,7 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
 
       <div class="flex justify-center gap-3">
         <TourComponents.restart_page url={@page_path} />
-        <TourComponents.reload_debugger on_click={
-          Tour.redirect_JS(RoutesHelper.settings())
-          |> JS.push("clear_tour")
-          |> JS.push("enable_settings")
-        } />
+        <TourComponents.reload_debugger url={RoutesHelper.settings()} />
       </div>
 
       <TourComponents.navigation prev_page={@prev_page} next_page={@next_page} />
@@ -211,35 +203,6 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
   @impl true
   def handle_event("increment", _params, socket) do
     {:noreply, update(socket, :counter, &(&1 + 1))}
-  end
-
-  def handle_event("enable_settings", _params, socket) do
-    Process.send_after(self(), :enable_settings, 500)
-    {:noreply, socket}
-  end
-
-  @impl true
-  def handle_info(:enable_settings, socket) do
-    Tour.enable_settings()
-
-    parent_pid = self()
-
-    spawn(fn ->
-      Process.monitor(parent_pid)
-
-      receive do
-        {:DOWN, _ref, :process, _pid, _reason} ->
-          @default_settings
-          |> Enum.each(fn {key, value} -> LiveDebugger.API.SettingsStorage.save(key, value) end)
-
-          Tour.disable_settings()
-
-        _ ->
-          :ok
-      end
-    end)
-
-    {:noreply, socket}
   end
 
   attr :demo, :map, required: true
@@ -275,4 +238,19 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
 
   defp demo_click(%{type: :spotlight, target: target}),
     do: Tour.spotlight_JS(target, dismiss: "click-anywhere")
+
+  defp reset_settings_on_process_exit(pid) do
+    Process.monitor(pid)
+
+    receive do
+      {:DOWN, _ref, :process, _pid, _reason} ->
+        @default_settings
+        |> Enum.each(fn {key, value} -> LiveDebugger.API.SettingsStorage.save(key, value) end)
+
+        Tour.disable_settings()
+
+      _ ->
+        nil
+    end
+  end
 end
