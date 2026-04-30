@@ -17,6 +17,15 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
   @tour_steps [
     %{
       id: 1,
+      title: "Go to settings",
+      description:
+        "Wherever in the debugger you are go to settings simply by clicking settings button in top-right corner of the page",
+      target: "#settings-button-tooltip",
+      action: {:highlight, [dismiss: "click-anywhere"]},
+      icon: "hero-cog-6-tooth"
+    },
+    %{
+      id: 2,
       title: "Highlight components",
       description:
         "This is the toggle the <b>Components Tree</b> and <b>Active LiveViews</b> pages rely on " <>
@@ -27,7 +36,7 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
       icon: "hero-sparkles"
     },
     %{
-      id: 2,
+      id: 3,
       title: "Show Debug Button",
       description:
         "With this off, the floating button disappears &ndash; but you can still open the debugger " <>
@@ -38,36 +47,39 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
       icon: "hero-cursor-arrow-rays"
     },
     %{
-      id: 3,
+      id: 4,
       title: "Enable DeadView mode",
       description:
         "Controls what happens when the LiveView you're inspecting dies. With it <b>ON</b>, " <>
           "the debugger pins to the dead process so you can browse its final assigns and last traces &ndash; " <>
           "the navbar swaps the green badge for a pink <b>Disconnected</b> one and shows a <b>Continue</b> button " <>
           "that jumps to the successor process. With it <b>OFF</b>, " <>
-          "the debugger silently follows along to the new live process, so post-mortem inspection becomes impossible. " <>
-          "(Page 4 of this tour actually triggers a crash if you want to see DeadView mode in action.)",
+          "the debugger silently follows along to the new live process, so post-mortem inspection becomes impossible. ",
       target: "div:has(> label > form > #dead-view-mode-switch)",
+      secondary_target: :navbar_connected,
       action: {:highlight, [dismiss: "click-target"]},
       icon: "hero-fire",
       demo: %{
-        type: :highlight,
-        target: :navbar_connected,
-        title: "Where to look",
+        type: :event,
+        event: "crash",
+        title: "Watch debugger behaviour",
         description:
-          "Click to highlight the navbar's connection badge — that's where the <b>Disconnected</b> indicator and <b>Continue</b> button appear once a LiveView dies with this mode on.",
-        label: "Show indicator",
-        icon: "hero-eye",
-        button_icon: "hero-viewfinder-circle"
+          "Trigger LiveView process exit and restart by clicking <b>crash</b> button below " <>
+            "or <b>refreshing the page</b> and observe how the debugger behaves depending on whether DeadView mode is enabled or not",
+        label: "Crash",
+        icon: "hero-beaker",
+        button_icon: "hero-fire",
+        button_class: "btn btn-sm btn-error"
       }
     },
     %{
-      id: 4,
+      id: 5,
       title: "Tracing enabled on start",
       description:
         "<b>OFF doesn't mean traces are lost</b> — they're always being captured behind the scenes. This setting only controls whether the live trace stream auto-starts when you open the debugger. " <>
           "Try it: toggle the switch off, jump to <b>Node Inspector</b> of this LiveView, click the demo button, then in the debugger click <b>Refresh</b> to load the trace you just generated. With the setting on, the trace would have streamed in live.",
       target: "div:has(> label > form > #tracing-enabled-on-start-switch)",
+      secondary_target: "button[aria-label='Refresh traces']",
       action: {:highlight, [dismiss: "click-target"]},
       icon: "hero-play-pause",
       demo: %{
@@ -82,7 +94,7 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
       }
     },
     %{
-      id: 5,
+      id: 6,
       title: "Garbage Collection",
       description:
         "Marked <b>High impact</b> for a reason. With <b>ON</b>, LiveDebugger periodically trims old trace data so memory stays bounded. " <>
@@ -103,7 +115,7 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
       }
     },
     %{
-      id: 6,
+      id: 7,
       title: "Refresh Tracing",
       description:
         "Reloads traced modules and reattaches the tracer to your callbacks. " <>
@@ -129,13 +141,10 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
     socket =
       socket
       |> assign(:counter, 0)
-      |> tour_page_assigns(@tour_steps, redirect_url: RoutesHelper.settings())
+      |> tour_page_assigns(@tour_steps, skip_redirect: true)
 
     if connected?(socket) do
-      Tour.enable_settings()
-
-      parent_pid = self()
-      spawn(fn -> reset_settings_on_process_exit(parent_pid) end)
+      handle_settings_lock()
     end
 
     {:ok, socket}
@@ -158,12 +167,12 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
           step={step}
           completed={MapSet.member?(@completed_steps, step.id)}
         >
-          <:button :if={step.id == 4}>
+          <:button :if={step.id in [4, 5]}>
             <div class="flex flex-col gap-3">
               <button
                 id={"tour-btn-#{step.id}-2"}
                 phx-click={
-                  Tour.highlight_JS("div:has(> label > form > #tracing-enabled-on-start-switch)")
+                  Tour.highlight_JS(step.target)
                   |> JS.push("activate_step", value: %{step: step.id})
                 }
                 class="btn btn-sm btn-soft"
@@ -174,9 +183,7 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
                 id={"tour-btn-#{step.id}-1"}
                 phx-click={
                   RoutesHelper.debugger_node_inspector(self())
-                  |> Tour.redirect_JS(
-                    then: Tour.step(:highlight, "button[aria-label='Refresh traces']")
-                  )
+                  |> Tour.redirect_JS(then: Tour.step(:highlight, step.secondary_target))
                 }
                 class="btn btn-sm btn-secondary"
               >
@@ -205,6 +212,11 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
     {:noreply, update(socket, :counter, &(&1 + 1))}
   end
 
+  @impl true
+  def handle_event("crash", _params, _socket) do
+    raise RuntimeError, "Boom! This crash was triggered by the tour to demonstrate DeadView mode."
+  end
+
   attr :demo, :map, required: true
   attr :counter, :integer, required: true
 
@@ -224,7 +236,10 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
           <div :if={@demo[:type] == :event} class="badge badge-lg badge-outline font-mono">
             counter: {@counter}
           </div>
-          <button phx-click={demo_click(@demo)} class="btn btn-sm btn-soft">
+          <button
+            phx-click={demo_click(@demo)}
+            class={@demo[:button_class] || "btn btn-sm btn-soft"}
+          >
             <.icon name={@demo.button_icon} class="size-4" /> {@demo.label}
           </button>
         </div>
@@ -239,18 +254,53 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
   defp demo_click(%{type: :spotlight, target: target}),
     do: Tour.spotlight_JS(target, dismiss: "click-anywhere")
 
+  defp handle_settings_lock() do
+    Process.whereis(:exit_handler)
+    |> case do
+      nil -> nil
+      pid -> send(pid, :settings_page_remounted)
+    end
+
+    Tour.enable_settings()
+
+    parent_pid = self()
+    spawn(fn -> reset_settings_on_process_exit(parent_pid) end)
+  end
+
   defp reset_settings_on_process_exit(pid) do
+    Process.register(self(), :exit_handler)
     Process.monitor(pid)
 
     receive do
-      {:DOWN, _ref, :process, _pid, _reason} ->
-        @default_settings
-        |> Enum.each(fn {key, value} -> LiveDebugger.API.SettingsStorage.save(key, value) end)
+      {:DOWN, _ref, :process, _pid, reason} ->
+        timeout =
+          case reason do
+            {%RuntimeError{}, _} -> 2000
+            _ -> 1000
+          end
 
-        Tour.disable_settings()
+        receive do
+          :settings_page_remounted -> :continue
+        after
+          timeout ->
+            @default_settings
+            |> Enum.each(fn {setting, value} ->
+              LiveDebugger.API.SettingsStorage.save(setting, value)
+
+              LiveDebugger.Bus.broadcast_event!(%LiveDebugger.App.Events.UserChangedSettings{
+                key: setting,
+                value: value,
+                from: self()
+              })
+            end)
+
+            Tour.disable_settings()
+        end
 
       _ ->
         nil
     end
+
+    Process.unregister(:exit_handler)
   end
 end
