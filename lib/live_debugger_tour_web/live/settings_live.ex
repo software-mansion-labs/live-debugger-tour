@@ -252,10 +252,17 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
     do: Tour.spotlight_JS(target, dismiss: "click-anywhere")
 
   defp handle_settings_lock() do
-    Process.whereis(:exit_handler)
-    |> case do
-      nil -> nil
-      pid -> send(pid, :settings_page_remounted)
+    case Process.whereis(:exit_handler) do
+      nil ->
+        :ok
+
+      pid ->
+        ref = Process.monitor(pid)
+        send(pid, :settings_page_remounted)
+
+        receive do
+          {:DOWN, ^ref, :process, ^pid, _reason} -> :ok
+        end
     end
 
     Tour.enable_settings()
@@ -269,6 +276,9 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
     Process.monitor(pid)
 
     receive do
+      :settings_page_remounted ->
+        :ok
+
       {:DOWN, _ref, :process, _pid, reason} ->
         timeout =
           case reason do
@@ -277,7 +287,7 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
           end
 
         receive do
-          :settings_page_remounted -> :continue
+          :settings_page_remounted -> :ok
         after
           timeout ->
             @default_settings
@@ -293,11 +303,6 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
 
             Tour.disable_settings()
         end
-
-      _ ->
-        nil
     end
-
-    Process.unregister(:exit_handler)
   end
 end

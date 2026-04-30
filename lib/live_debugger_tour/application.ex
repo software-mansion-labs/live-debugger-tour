@@ -20,12 +20,14 @@ defmodule LiveDebuggerTour.Application do
       LiveDebuggerTourWeb.Endpoint
     ]
 
-    spawn(&open_tour_in_browser/0)
-
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: LiveDebuggerTour.Supervisor]
-    Supervisor.start_link(children, opts)
+
+    with {:ok, sup} <- Supervisor.start_link(children, opts) do
+      spawn(fn -> browser_open(LiveDebuggerTourWeb.Endpoint.url()) end)
+      {:ok, sup}
+    end
   end
 
   # Tell Phoenix to update the endpoint configuration
@@ -34,18 +36,6 @@ defmodule LiveDebuggerTour.Application do
   def config_change(changed, _new, removed) do
     LiveDebuggerTourWeb.Endpoint.config_change(changed, removed)
     :ok
-  end
-
-  defp open_tour_in_browser() do
-    Process.sleep(500)
-
-    Application.started_applications()
-    |> Enum.any?(fn app -> elem(app, 0) == :live_debugger_tour end)
-    |> if do
-      browser_open(LiveDebuggerTourWeb.Endpoint.url())
-    else
-      open_tour_in_browser()
-    end
   end
 
   def browser_open(url) do
