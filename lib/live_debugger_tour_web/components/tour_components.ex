@@ -236,7 +236,7 @@ defmodule LiveDebuggerTourWeb.Components.TourComponents do
     """
   end
 
-  attr :url, :string, required: true
+  attr :url, :string, default: "/"
 
   def reload_debugger(assigns) do
     ~H"""

@@ -5,6 +5,8 @@ defmodule LiveDebuggerTour.Application do
 
   use Application
 
+  require Logger
+
   @impl true
   def start(_type, _args) do
     children = [
@@ -21,7 +23,11 @@ defmodule LiveDebuggerTour.Application do
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: LiveDebuggerTour.Supervisor]
-    Supervisor.start_link(children, opts)
+
+    with {:ok, sup} <- Supervisor.start_link(children, opts) do
+      spawn(fn -> browser_open(LiveDebuggerTourWeb.Endpoint.url()) end)
+      {:ok, sup}
+    end
   end
 
   # Tell Phoenix to update the endpoint configuration
@@ -29,6 +35,34 @@ defmodule LiveDebuggerTour.Application do
   @impl true
   def config_change(changed, _new, removed) do
     LiveDebuggerTourWeb.Endpoint.config_change(changed, removed)
+    :ok
+  end
+
+  def browser_open(url) do
+    win_cmd_args = ["/c", "start", String.replace(url, "&", "^&")]
+
+    cmd_args =
+      case :os.type() do
+        {:win32, _} ->
+          {"cmd", win_cmd_args}
+
+        {:unix, :darwin} ->
+          {"open", [url]}
+
+        {:unix, _} ->
+          cond do
+            System.find_executable("xdg-open") -> {"xdg-open", [url]}
+            # When inside WSL
+            System.find_executable("cmd.exe") -> {"cmd.exe", win_cmd_args}
+            true -> nil
+          end
+      end
+
+    case cmd_args do
+      {cmd, args} -> System.cmd(cmd, args)
+      nil -> Logger.warning("could not open the browser, no open command found in the system")
+    end
+
     :ok
   end
 end
