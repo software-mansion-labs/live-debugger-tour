@@ -12,8 +12,6 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
   alias LiveDebuggerTourWeb.Components.TourComponents
   alias Phoenix.LiveView.JS
 
-  alias LiveDebugger.App.Web.Endpoint, as: LiveDebuggerEndpoint
-
   @tour_steps [
     %{
       id: 1,
@@ -40,7 +38,7 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
       title: "Show Debug Button",
       description:
         "With this off, the floating button disappears &ndash; but you can still open the debugger " <>
-          "by visiting <a href=\"#{LiveDebuggerEndpoint.static_url()}\">#{LiveDebuggerEndpoint.static_url()}</a> directly " <>
+          "by visiting <a href=\"http://localhost:4007\">http://localhost:4007</a> directly " <>
           "and picking the LiveView you want. The button is just a one-click shortcut.",
       target: "div:has(> label > form > #debug-button-switch)",
       action: {:highlight, [dismiss: "click-anywhere"]},
