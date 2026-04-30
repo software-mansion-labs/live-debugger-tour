@@ -17,7 +17,7 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
       id: 1,
       title: "Go to settings",
       description:
-        "Wherever you are in the debugger, go to settings by simply clicking settings button in top-right corner of the page",
+        "Wherever you are in the debugger, go to settings by clicking settings button in the <span class=\"text-success font-bold\">top-right corner</span> of the page",
       target: "#settings-button-tooltip",
       action: {:highlight, [dismiss: "click-anywhere"]},
       icon: "hero-cog-6-tooth"
@@ -52,7 +52,7 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
           "the debugger pins to the dead process so you can browse its final assigns and last traces &ndash; " <>
           "the navbar swaps the green badge for a pink <b>Disconnected</b> one and shows a <b>Continue</b> button " <>
           "that jumps to the successor process. With it <b>OFF</b>, " <>
-          "the debugger silently follows along to the new live process, so post-mortem inspection becomes impossible. ",
+          "the debugger silently follows along to the new live process, so post-mortem inspection becomes impossible.",
       target: "div:has(> label > form > #dead-view-mode-switch)",
       secondary_target: :navbar_connected,
       action: {:highlight, [dismiss: "click-target"]},
@@ -63,7 +63,7 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
         title: "Watch debugger behaviour",
         description:
           "Trigger LiveView process exit and restart by clicking <b>crash</b> button below " <>
-            "or <b>refreshing the page</b> and observe how the debugger behaves depending on whether DeadView mode is enabled or not",
+            "or by <b>refreshing the page</b>. Observe how LiveDebugger behaves depending on whether DeadView mode is enabled or not",
         label: "Crash",
         icon: "hero-beaker",
         button_icon: "hero-fire",
