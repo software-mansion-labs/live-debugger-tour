@@ -86,32 +86,21 @@ defmodule LiveDebuggerTour.PageDiscovery do
   end
 
   @doc """
-  Returns `{prev_path, next_path}` for a given page number.
-  Returns `"/"` as prev for page 1, and `nil` as next for the last page.
+  Returns `{prev_path, next_path}` for a given page number, skipping pages
+  marked `coming_soon: true`. Falls back to `"/"` for prev and `nil` for
+  next when no eligible page exists.
   """
   def page_navigation(page_number) do
     pages = list_pages()
-    index = Enum.find_index(pages, &(&1.number == page_number))
 
-    prev_page =
-      cond do
-        is_nil(index) -> "/"
-        index == 0 -> "/"
-        true -> Enum.at(pages, index - 1) |> Map.get(:path)
-      end
+    case Enum.find_index(pages, &(&1.number == page_number)) do
+      nil ->
+        {"/", nil}
 
-    next_page =
-      if index do
-        pages
-        |> Enum.at(index + 1)
-        |> then(fn
-          nil -> nil
-          %{coming_soon: true} -> nil
-          %{path: path} -> path
-        end)
-      end
-
-    {prev_page, next_page}
+      index ->
+        {before, [_current | after_pages]} = Enum.split(pages, index)
+        {first_path(Enum.reverse(before), "/"), first_path(after_pages, nil)}
+    end
   end
 
   @doc """
@@ -143,5 +132,12 @@ defmodule LiveDebuggerTour.PageDiscovery do
 
   defp page_module?(mod) do
     Code.ensure_loaded?(mod) and function_exported?(mod, :__page_meta__, 0)
+  end
+
+  defp first_path(pages, fallback) do
+    Enum.find_value(pages, fallback, fn
+      %{coming_soon: true} -> nil
+      %{path: path} -> path
+    end)
   end
 end
