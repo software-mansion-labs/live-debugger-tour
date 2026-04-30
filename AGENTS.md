@@ -8,7 +8,8 @@ The goal is to make LiveDebugger approachable by offering a curated set of easil
 
 ### LiveDebugger dependency
 
-LiveDebugger is included as a **local path dependency** (`{:live_debugger, path: "../live-debugger", only: :dev}`). It is on a special branch that exposes a tour API (see "Tour API" section below). The dependency is dev-only — this app is not intended for production use.
+LiveDebugger is included from **github branch** (`{:live_debugger, github: "software-mansion/live-debugger", branch: "live-debugger-tour", only: [:dev, :test]}`).
+It is on a special branch that exposes a tour API (see "Tour API" section below). The dependency is dev-only — this app is not intended for production use.
 
 ### Tour topics
 
@@ -25,7 +26,7 @@ Each topic maps to a numbered tour step LiveView:
 9. [ ] **Analyzing diffs** — Dive into the actual data payloads (diffs) sent over the wire to the browser to understand how Phoenix optimizes UI updates.
 10. [ ] **Resources** — Monitor real-time performance graphs and watch how specific user interactions cause spikes or changes in system resource usage.
 11. [x] **Active LiveViews** — Use the dynamic dashboard to see all currently running LiveView processes across the application as they connect and disconnect.
-12. [ ] **Settings** — Overview of the customization options available to tweak the debugger UI and connection parameters.
+12. [x] **Settings** — Overview of the customization options available to tweak the debugger UI and connection parameters.
 
 ## Project guidelines
 
