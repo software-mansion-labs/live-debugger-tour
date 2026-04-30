@@ -17,7 +17,7 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
       id: 1,
       title: "Go to settings",
       description:
-        "Wherever in the debugger you are go to settings simply by clicking settings button in top-right corner of the page",
+        "Wherever you are in the debugger, go to settings by simply clicking settings button in top-right corner of the page",
       target: "#settings-button-tooltip",
       action: {:highlight, [dismiss: "click-anywhere"]},
       icon: "hero-cog-6-tooth"
@@ -247,7 +247,6 @@ defmodule LiveDebuggerTourWeb.Live.SettingsLive do
   end
 
   defp demo_click(%{type: :event, event: event}), do: event
-  defp demo_click(%{type: :highlight, target: target}), do: Tour.highlight_JS(target)
 
   defp demo_click(%{type: :spotlight, target: target}),
     do: Tour.spotlight_JS(target, dismiss: "click-anywhere")

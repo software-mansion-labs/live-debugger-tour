@@ -5,6 +5,8 @@ defmodule LiveDebuggerTour.Application do
 
   use Application
 
+  require Logger
+
   @impl true
   def start(_type, _args) do
     children = [
@@ -40,29 +42,37 @@ defmodule LiveDebuggerTour.Application do
     Application.started_applications()
     |> Enum.any?(fn app -> elem(app, 0) == :live_debugger_tour end)
     |> if do
-      browser_open(LiveDebuggerTourWeb.Endpoint.static_url())
+      browser_open(LiveDebuggerTourWeb.Endpoint.url())
     else
       open_tour_in_browser()
     end
   end
 
-  defp browser_open(path) do
-    start_browser_command =
+  def browser_open(url) do
+    win_cmd_args = ["/c", "start", String.replace(url, "&", "^&")]
+
+    cmd_args =
       case :os.type() do
         {:win32, _} ->
-          "start"
+          {"cmd", win_cmd_args}
 
         {:unix, :darwin} ->
-          "open"
+          {"open", [url]}
 
         {:unix, _} ->
-          "xdg-open"
+          cond do
+            System.find_executable("xdg-open") -> {"xdg-open", [url]}
+            # When inside WSL
+            System.find_executable("cmd.exe") -> {"cmd.exe", win_cmd_args}
+            true -> nil
+          end
       end
 
-    if System.find_executable(start_browser_command) do
-      System.cmd(start_browser_command, [path])
-    else
-      Mix.raise("Command not found: #{start_browser_command}")
+    case cmd_args do
+      {cmd, args} -> System.cmd(cmd, args)
+      nil -> Logger.warning("could not open the browser, no open command found in the system")
     end
+
+    :ok
   end
 end
