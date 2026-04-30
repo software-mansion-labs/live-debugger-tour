@@ -18,6 +18,8 @@ defmodule LiveDebuggerTour.Application do
       LiveDebuggerTourWeb.Endpoint
     ]
 
+    spawn(&open_tour_in_browser/0)
+
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: LiveDebuggerTour.Supervisor]
@@ -30,5 +32,37 @@ defmodule LiveDebuggerTour.Application do
   def config_change(changed, _new, removed) do
     LiveDebuggerTourWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  defp open_tour_in_browser() do
+    Process.sleep(500)
+
+    Application.started_applications()
+    |> Enum.any?(fn app -> elem(app, 0) == :live_debugger_tour end)
+    |> if do
+      browser_open(LiveDebuggerTourWeb.Endpoint.static_url())
+    else
+      open_tour_in_browser()
+    end
+  end
+
+  defp browser_open(path) do
+    start_browser_command =
+      case :os.type() do
+        {:win32, _} ->
+          "start"
+
+        {:unix, :darwin} ->
+          "open"
+
+        {:unix, _} ->
+          "xdg-open"
+      end
+
+    if System.find_executable(start_browser_command) do
+      System.cmd(start_browser_command, [path])
+    else
+      Mix.raise("Command not found: #{start_browser_command}")
+    end
   end
 end
