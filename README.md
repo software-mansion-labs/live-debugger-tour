@@ -36,11 +36,11 @@ The tour walks you through LiveDebugger's core features across a series of guide
 5. **Components Tree** - Visualize complex UI hierarchies with multiple LiveComponents and the highlight feature.
 6. **Async Jobs** - Observe `assign_async` behavior and background task state transitions.
 7. **Streams** - See how Phoenix Streams are handled and efficiently managed by the debugger.
-8. **Global Callback Traces** (coming soon) - Analyze cross-node communication between child components and parent views.
-9. **Analyzing Diffs** (coming soon) - Inspect the actual data payloads sent over the wire to understand Phoenix's UI update optimizations.
-10. **Resources** (coming soon) - Monitor real-time performance graphs and observe how interactions affect system resource usage.
-11. **Active LiveViews** (coming soon) - See all currently running LiveView processes across the application.
-12. **Settings** (coming soon) - Explore customization options for the debugger UI and connection parameters.
+8. **Global Callback Traces** - Analyze cross-node communication between child components and parent views.
+9. **Analyzing Diffs** - Inspect the actual data payloads sent over the wire to understand Phoenix's UI update optimizations.
+10. **Resources** - Monitor real-time performance graphs and observe how interactions affect system resource usage.
+11. **Active LiveViews** - See all currently running LiveView processes across the application.
+12. **Settings** - Explore customization options for the debugger UI and connection parameters.
 
 ## Learn more
 
