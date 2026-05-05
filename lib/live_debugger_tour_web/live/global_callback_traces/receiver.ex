@@ -1,4 +1,5 @@
 defmodule LiveDebuggerTourWeb.Live.GlobalCallbackTraces.Receiver do
+  @moduledoc false
   use LiveDebuggerTourWeb, :live_component
 
   def update(%{new_message: {msg, ts}}, socket) do

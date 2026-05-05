@@ -129,7 +129,7 @@ defmodule LiveDebuggerTourWeb.Live.ResourcesLive do
 
   @impl true
   def handle_event("spike_cpu", _params, socket) do
-    Enum.reduce(1..200_000, 0, fn x, acc -> acc + :erlang.phash2(x) end)
+    _ = Enum.reduce(1..200_000, 0, fn x, acc -> acc + :erlang.phash2(x) end)
     {:noreply, socket}
   end
 
