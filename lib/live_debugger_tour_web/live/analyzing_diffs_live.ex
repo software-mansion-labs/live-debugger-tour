@@ -84,7 +84,7 @@ defmodule LiveDebuggerTourWeb.Live.AnalyzingDiffsLive do
       id: 8,
       title: "Search inside payloads",
       description:
-        "The search bar matches text inside diff bodies, not just callback args. Try searching for text values you see in the demo to find every diff that touched it &ndash; matches highlight inside each expanded body.",
+        "The search bar matches text inside diff bodies, not just callback args. <b>Pause tracing</b> and <b>try searching</b> for text values you see in the demo to find every diff that touched it.",
       target: :callback_traces_search_bar,
       action: {:highlight, [dismiss: "click-anywhere"]},
       icon: "hero-magnifying-glass-circle"
