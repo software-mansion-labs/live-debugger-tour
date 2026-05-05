@@ -55,7 +55,7 @@ defmodule LiveDebuggerTourWeb.Live.AnalyzingDiffsLive do
       title: "Send your first diff",
       description:
         "Click <b>Tick counter</b> in the demo above. A new <b>“Diff sent”</b> entry appears at the top of the trace list with a tiny byte-size badge &ndash; Phoenix only shipped the integer that changed.",
-      target: "wire-payload-demo",
+      target: "tick-counter",
       action: {:client_spotlight, []},
       icon: "hero-paper-airplane",
       demo: %{event: "tick_counter"}
@@ -66,7 +66,9 @@ defmodule LiveDebuggerTourWeb.Live.AnalyzingDiffsLive do
       description:
         "Click the diff trace to expand it. The <b>Diff content</b> body is the literal JSON Phoenix wrote to the WebSocket &ndash; a sparse map keyed by component IDs, carrying <i>only</i> the fields that changed. Everything else is reused from the previous render.",
       target: "#global-traces-stream > :first-child",
-      action: {:spotlight, [dismiss: "click-anywhere"]},
+      secondary_target:
+        "#global-traces-stream > :first-child > summary > div > :last-child > :last-child > span",
+      action: {:spotlight, [dismiss: "click-target"]},
       icon: "hero-magnifying-glass"
     },
     %{
@@ -139,6 +141,20 @@ defmodule LiveDebuggerTourWeb.Live.AnalyzingDiffsLive do
               phx-click={
                 Tour.highlight_JS(step.target)
                 |> JS.concat(Tour.highlight_JS("[aria-label='Icon panel right']", clear: false))
+                |> JS.push("activate_step", value: %{step: step.id})
+              }
+              class="btn btn-sm btn-soft"
+            >
+              <.icon name="hero-viewfinder-circle" class="size-4" /> Highlight
+            </button>
+          </:button>
+          <:button :if={step.id == 6}>
+            <button
+              id={"tour-btn-#{step.id}"}
+              disabled={step_disabled?(step.id, @completed_steps)}
+              phx-click={
+                Tour.spotlight_JS(step.target)
+                |> JS.concat(Tour.highlight_JS(step.secondary_target, clear: false))
                 |> JS.push("activate_step", value: %{step: step.id})
               }
               class="btn btn-sm btn-soft"
@@ -239,7 +255,7 @@ defmodule LiveDebuggerTourWeb.Live.AnalyzingDiffsLive do
         </div>
 
         <div class="flex flex-wrap gap-2 mt-4">
-          <button phx-click="tick_counter" class="btn btn-sm btn-soft">
+          <button id="tick-counter" phx-click="tick_counter" class="btn btn-sm btn-soft">
             <.icon name="hero-plus" class="size-4" /> Tick counter
           </button>
           <button phx-click="cycle_message" class="btn btn-sm btn-soft btn-primary">
