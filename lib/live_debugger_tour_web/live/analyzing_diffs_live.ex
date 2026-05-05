@@ -159,7 +159,7 @@ defmodule LiveDebuggerTourWeb.Live.AnalyzingDiffsLive do
               }
               class="btn btn-sm btn-soft"
             >
-              <.icon name="hero-viewfinder-circle" class="size-4" /> Highlight
+              <.icon name="hero-viewfinder-circle" class="size-4" /> Spotlight
             </button>
           </:button>
         </TourComponents.tour_step>
