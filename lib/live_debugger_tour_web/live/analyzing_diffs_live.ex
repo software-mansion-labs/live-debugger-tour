@@ -25,46 +25,64 @@ defmodule LiveDebuggerTourWeb.Live.AnalyzingDiffsLive do
     },
     %{
       id: 2,
+      title: "Pause tracing",
+      description:
+        "Filters can only be edited when tracing is paused. Click the <b>Stop</b> button to freeze the live trace stream so we can configure what to capture.",
+      target: :callback_traces_toggle_tracing,
+      action: {:spotlight, [dismiss: "click-target"]},
+      icon: "hero-pause"
+    },
+    %{
+      id: 3,
       title: "Enable diff tracing",
       description:
-        "Diff traces are hidden by default to keep the trace list focused. Open the <b>Filters</b> sidebar, scroll to <b>Other filters</b>, toggle <b>“Show LiveView diffs sent to browser”</b>, and click <b>Apply</b>.",
+        "Diff traces are hidden by default. With tracing paused, open the <b>Filters</b> sidebar, scroll to <b>Other filters</b>, toggle <b>“Show LiveView diffs sent to browser”</b>, and click <b>Apply</b>.",
       target: "div:has(> div > div > input#filters-sidebar-form_trace_diffs)",
       action: {:highlight, [dismiss: "click-target"]},
       icon: "hero-funnel"
     },
     %{
-      id: 3,
+      id: 4,
+      title: "Resume tracing",
+      description:
+        "With the diff filter saved, click <b>Start</b> to resume capturing. Diffs will now stream into the panel alongside callback traces as you interact with the demo above.",
+      target: :callback_traces_toggle_tracing,
+      action: {:spotlight, [dismiss: "click-target"]},
+      icon: "hero-play"
+    },
+    %{
+      id: 5,
       title: "Send your first diff",
       description:
-        "Click <b>Tick counter</b> in the demo above. A new <b>“Diff sent”</b> entry appears at the top of the trace list with a tiny byte-size badge — Phoenix only shipped the integer that changed.",
+        "Click <b>Tick counter</b> in the demo above. A new <b>“Diff sent”</b> entry appears at the top of the trace list with a tiny byte-size badge &ndash; Phoenix only shipped the integer that changed.",
       target: "wire-payload-demo",
       action: {:client_spotlight, []},
       icon: "hero-paper-airplane",
       demo: %{event: "tick_counter"}
     },
     %{
-      id: 4,
+      id: 6,
       title: "Inspect the wire payload",
       description:
-        "Click the diff trace to expand it. The <b>Diff content</b> body is the literal JSON Phoenix wrote to the WebSocket — a sparse map keyed by component IDs, carrying <i>only</i> the fields that changed. Everything else is reused from the previous render.",
+        "Click the diff trace to expand it. The <b>Diff content</b> body is the literal JSON Phoenix wrote to the WebSocket &ndash; a sparse map keyed by component IDs, carrying <i>only</i> the fields that changed. Everything else is reused from the previous render.",
       target: "#global-traces-stream > :first-child",
       action: {:spotlight, [dismiss: "click-anywhere"]},
       icon: "hero-magnifying-glass"
     },
     %{
-      id: 5,
+      id: 7,
       title: "Different changes, different diffs",
       description:
-        "Trigger each demo button in turn: <b>Cycle message</b> (text update), <b>Add item</b> (collection update), and <b>Update everything</b> (multi-key update). Compare the size badges — bigger UI changes ship bigger diffs, but Phoenix never re-sends what didn't move.",
+        "Trigger each demo button in turn: <b>Cycle message</b> (text update), <b>Add item</b> (collection update), and <b>Update everything</b> (multi-key update). Compare the size badges &ndash; bigger UI changes ship bigger diffs, but Phoenix never re-sends what didn't move.",
       target: "wire-payload-demo",
       action: {:client_spotlight, []},
       icon: "hero-scale"
     },
     %{
-      id: 6,
+      id: 8,
       title: "Search inside payloads",
       description:
-        "The search bar matches text inside diff bodies, not just callback args. Try searching for <b>“counter”</b> to find every diff that touched it — matches highlight inside each expanded body.",
+        "The search bar matches text inside diff bodies, not just callback args. Try searching for text values you see in the demo to find every diff that touched it &ndash; matches highlight inside each expanded body.",
       target: :callback_traces_search_bar,
       action: {:highlight, [dismiss: "click-anywhere"]},
       icon: "hero-magnifying-glass-circle"
@@ -99,7 +117,7 @@ defmodule LiveDebuggerTourWeb.Live.AnalyzingDiffsLive do
           <p class="text-sm">
             On every state change, Phoenix renders a sparse JSON map containing only the parts
             of the template that actually changed and ships it over the WebSocket. The browser
-            merges it into the previous render — no full HTML re-paint, no over-the-wire bloat.
+            merges it into the previous render &ndash; no full HTML re-paint, no over-the-wire bloat.
             That's why LiveView feels instant on slow networks.
           </p>
         </div>
@@ -112,10 +130,12 @@ defmodule LiveDebuggerTourWeb.Live.AnalyzingDiffsLive do
           :for={step <- @tour_steps}
           step={step}
           completed={MapSet.member?(@completed_steps, step.id)}
+          disabled={step_disabled?(step.id, @completed_steps)}
         >
-          <:button :if={step.id == 2}>
+          <:button :if={step.id == 3}>
             <button
               id={"tour-btn-#{step.id}"}
+              disabled={step_disabled?(step.id, @completed_steps)}
               phx-click={
                 Tour.highlight_JS(step.target)
                 |> JS.concat(Tour.highlight_JS("[aria-label='Icon panel right']", clear: false))
@@ -173,6 +193,10 @@ defmodule LiveDebuggerTourWeb.Live.AnalyzingDiffsLive do
   defp append_item(items) do
     items ++ ["Item #{length(items) + 1}"]
   end
+
+  defp step_disabled?(step_id, completed) when step_id > 4, do: not MapSet.member?(completed, 4)
+  defp step_disabled?(step_id, completed) when step_id > 2, do: not MapSet.member?(completed, 2)
+  defp step_disabled?(_, _), do: false
 
   attr :counter, :integer, required: true
   attr :message, :string, required: true
