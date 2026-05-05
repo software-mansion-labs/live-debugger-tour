@@ -1,4 +1,5 @@
 defmodule LiveDebuggerTourWeb.Live.GlobalCallbackTraces.Sender do
+  @moduledoc false
   use LiveDebuggerTourWeb, :live_component
 
   def render(assigns) do
